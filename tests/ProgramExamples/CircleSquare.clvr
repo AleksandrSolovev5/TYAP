@@ -1,0 +1,25 @@
+$ i want to write somethin here
+
+$*
+    that is multiline comment
+    time to write poems
+*$
+
+int main()
+[
+    $ the program read circle raduis and write his square
+
+    $ ty  ident  = expr
+    float radius = 0.0;
+    const float PI = 3.1415;
+
+    $ read radius value
+    input(raduis);
+
+    $ that variable calculate circle sqaure 
+    float circleSquare = radius * radius * PI;
+
+    $ and go to out
+    string str = "Circle square: ";
+    output(str, circleSquare);
+]

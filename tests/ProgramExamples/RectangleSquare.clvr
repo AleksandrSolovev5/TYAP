@@ -1,0 +1,11 @@
+$ this program read rectangle sides and write rectangle square
+
+int main()
+[
+    output("type <width> <height> here:\n");
+
+    float width, float height;
+    input(width, height);
+
+    output("rectangle square: ", width * height);
+]
