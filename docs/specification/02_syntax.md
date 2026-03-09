@@ -28,7 +28,7 @@ statement =
     | compound_statement ;
 
 variable_declaration = type, identifier, [ "=", expression ], { ",", identifier, type, [ "=", expression ] } ;
-constant_definition ="const", identifier, type, "=", expression ;
+constant_definition ="const", type, identifier, "=", expression ;
 assignment = identifier, "=", expression ;
 
 
