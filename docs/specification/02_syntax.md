@@ -17,14 +17,12 @@
 ## EBNF - грамматика
 ````
 program = statement, { ";", statement }, [ ";" ] ;
-type = "int" | "string" | "bool" | "float";
+type = "int" | "string" | "float";
 
 statement =
       variable_declaration
     | constant_definition
     | assignment
-    | if_statement
-    | while_statement
     | input_statement
     | output_statement
     | compound_statement ;
@@ -38,9 +36,7 @@ input_statement = "input", "(", identifier, { ",", identifier }, ")" ;
 output_statement = "output", "(", [ expression_list ], ")" ;
 expression_list = expression, { ",", expression } ;
 
-if_statement = "if", "(", expression, ")", statement_or_block, [ "else", statement_or_block ] ;
 statement_or_block = statement | compound_statement ;
-while_statement = "while", "(", expression, ")", compound_statement ;
 compound_statement = "[", statement, { ";", statement }, [ ";" ], "]" ;
 
 break_statement = "break" ;
