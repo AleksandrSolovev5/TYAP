@@ -6,12 +6,10 @@
 
 | Приоритет  | Операторы                        | Тип операции   | Ассоциативность |
 |------------|----------------------------------|----------------|-----------------|
-| 7 (высший) | `+`, `-`                         | Унарная        | Правая          |
-| 6          | `*`, `/`, `%`                    | Арифметическая | Левая           |
-| 5          | `+`, `-`                         | Арифметическая | Левая           |
-| 4          | `<`, `>`, `<=`, `>=`, `==`, `!=` | Сравнение      | Неассоциативная |
-| 3          | `&&`                             | Логическая     | Левая           |
-| 2          | \|\|                             | Логическая     | Левая           |
+| 5 (высший) | `+`, `-`                         | Унарная        | Правая          |
+| 4          | `*`, `/`, `%`                    | Арифметическая | Левая           |
+| 3          | `+`, `-`                         | Арифметическая | Левая           |
+| 2          | `<`, `>`, `<=`, `>=`, `==`, `!=` | Сравнение      | Неассоциативная |
 | 1 (низший) | `=`                              | Присваивание   | Правая          |
 
 ## EBNF - грамматика
@@ -27,7 +25,7 @@ statement =
     | output_statement
     | compound_statement ;
 
-variable_declaration = type, identifier, [ "=", expression ], { ",", identifier, type, [ "=", expression ] } ;
+variable_declaration = type, identifier, [ "=", expression ], { ",", type, identifier, [ "=", expression ] } ;
 constant_definition ="const", type, identifier, "=", expression ;
 assignment = identifier, "=", expression ;
 
@@ -39,13 +37,7 @@ expression_list = expression, { ",", expression } ;
 statement_or_block = statement | compound_statement ;
 compound_statement = "[", statement, { ";", statement }, [ ";" ], "]" ;
 
-break_statement = "break" ;
-continue_statement = "continue" ;
-
-
-expression = logical_or_expression ;
-logical_or_expression = logical_and_expression, { "||", logical_and_expression } ;
-logical_and_expression = equality_expression, { "&&", equality_expression } ;
+expression = equality_expression ;
 equality_expression = relational_expression, { ( "==" | "!=" ), relational_expression } ;
 relational_expression = additive_expression, { ( "<" | ">" | "<=" | ">=" ), additive_expression } ;
 additive_expression = multiplicative_expression, { ( "+" | "-" ), multiplicative_expression } ;
