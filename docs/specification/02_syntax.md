@@ -37,9 +37,7 @@ expression_list = expression, { ",", expression } ;
 statement_or_block = statement | compound_statement ;
 compound_statement = "[", statement, { ";", statement }, [ ";" ], "]" ;
 
-expression = equality_expression ;
-equality_expression = relational_expression, { ( "==" | "!=" ), relational_expression } ;
-relational_expression = additive_expression, { ( "<" | ">" | "<=" | ">=" ), additive_expression } ;
+expression = additive_expression ;
 additive_expression = multiplicative_expression, { ( "+" | "-" ), multiplicative_expression } ;
 multiplicative_expression = unary_expression, { ( "*" | "/" | "%" ), unary_expression } ;
 unary_expression = ( "+" | "-" ), unary_expression | primary_expression ;
