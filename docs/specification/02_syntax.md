@@ -25,6 +25,7 @@ statement =
     | output_statement
     | compound_statement ;
 
+function_declaration = type, identifier, "(", [ parameter_list ], ")", compound_statement ;
 variable_declaration = type, identifier, [ "=", expression ], { ",", type, identifier, [ "=", expression ] } ;
 constant_definition ="const", type, identifier, "=", expression ;
 assignment = identifier, "=", expression ;
