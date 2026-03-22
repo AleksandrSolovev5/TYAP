@@ -66,7 +66,7 @@ float_literal = [sign], digit, {digit}, ".", digit, {digit} ;
 string_literal = '"', {ascii_character - '"' | escape_sequence}, '"' ;
 literal = int_literal | string_literal | float_literal ;
 
-operator = "==" | "!=" | "<=" | ">=" | "||" | "&&" | "<" | ">" | "+" | "-" | "*" | "/" | "%" | "=" ;
+operator =  "+" | "-" | "*" | "/" | "%" | "=" ;
 
 keyword = "input" | "output" | "int" | "string" | "float" | "const" ;
 
