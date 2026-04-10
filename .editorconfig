@@ -368,6 +368,7 @@ dotnet_diagnostic.SA1611.severity = none
 dotnet_diagnostic.SA1615.severity = none
 dotnet_diagnostic.SA1642.severity = none
 dotnet_diagnostic.SA1118.severity = none
+dotnet_diagnostic.SA1602.severity = none
 
 # Запрет на var, встроенный в IDE
 dotnet_diagnostic.IDE0007.severity = error
@@ -380,3 +381,5 @@ dotnet_diagnostic.RCS1012.severity = error
 
 # Отключаем излишние правила Roslynator
 dotnet_diagnostic.RCS1123.severity = none
+
+
