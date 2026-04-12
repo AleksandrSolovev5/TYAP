@@ -33,3 +33,7 @@ obj/
 *.suo
 *.userosscache
 *.sln.docstates
+
+# Данные о покрытии кода тестами
+tests/coverage/
+tests/coverage-report/

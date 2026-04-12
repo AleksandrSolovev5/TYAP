@@ -1,0 +1,5 @@
+$ эта программа, демонстрирующая вывод разных литералов
+
+output(3.14); output(" / ");
+output(42); output(" / ");
+output("Lorem ipsum dolor sit amet, consectetur adipiscing elit");

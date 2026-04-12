@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+
+    <NoWarn>SA1512;SA1516;SA1308;SA1202;SA1300;SA1116;SA1117;SA1500;SA1413;SA1028;RCS1008;RCS1012</NoWarn>
+  <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\src\Interpreter\Interpreter.csproj" />
+    <ProjectReference Include="..\src\Runner\Runner.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Features\**\*.clvr">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Programs\**\*.clvr">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>
