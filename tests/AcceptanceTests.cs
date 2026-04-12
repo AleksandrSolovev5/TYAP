@@ -11,10 +11,10 @@ public class AcceptanceTests
     public AcceptanceTests()
     {
         _runnerPath = Path.GetFullPath(
-            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, 
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
                 "..", "..", "..", "..", "src", "Runner", "bin", "Debug", "net10.0", "Runner.exe")
         );
-    
+
         _testDataPath = AppDomain.CurrentDomain.BaseDirectory;
     }
 
@@ -26,7 +26,7 @@ public class AcceptanceTests
             throw new FileNotFoundException($"test file not found: {fullPath}");
         }
 
-        var process = new Process
+        Process process = new Process
         {
             StartInfo = new ProcessStartInfo
             {
@@ -47,16 +47,15 @@ public class AcceptanceTests
     }
 
     /// <summary>
-    /// приёмочные тесты для отдельных функций языка 
+    /// приёмочные тесты для отдельных функций языка
     /// </summary>
-
     [Fact]
     public void FeatureOutputInteger()
     {
         string output = RunInterpreter("Features/OutputInteger.clvr");
         Assert.Equal("42 /", output);
     }
-    
+
     [Fact]
     public void FeatureOutputFloatingPoint()
     {
@@ -72,7 +71,7 @@ public class AcceptanceTests
         Assert.Contains("abcdefghijklmnopqrstuvwxyz", output);
         Assert.Contains("ABCDEFGHIJKLMNOPQRSTUVWXYZ", output);
     }
-    
+
     [Fact]
     public void FeatureCommentSingleLine()
     {
@@ -80,7 +79,7 @@ public class AcceptanceTests
         Assert.Equal("хорошыйтест", output);
         Assert.DoesNotContain("коммент", output);
     }
-    
+
     [Fact]
     public void FeatureCommentMultiLine()
     {
@@ -92,7 +91,6 @@ public class AcceptanceTests
     /// <summary>
     /// приёмочные тесты для полноценных программ
     /// </summary>
-    
     [Fact]
     public void ProgramHelloWorld()
     {
