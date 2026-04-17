@@ -1,31 +1,17 @@
 using System.Diagnostics;
 
+using Interpreter;
+
 using Xunit;
 
 namespace Tests;
 
 public class AcceptanceTests
 {
-    private readonly string _runnerPath;
     private readonly string _testDataPath;
 
     public AcceptanceTests()
     {
-        _runnerPath = Path.GetFullPath(
-            Path.Combine(
-                AppDomain.CurrentDomain.BaseDirectory,
-                "..",
-                "..",
-                "..",
-                "..",
-                "src",
-                "Runner",
-                "bin",
-                "Debug",
-                "net10.0",
-                "Runner.exe")
-        );
-
         _testDataPath = AppDomain.CurrentDomain.BaseDirectory;
     }
 
@@ -102,26 +88,34 @@ public class AcceptanceTests
         string fullPath = Path.Combine(_testDataPath, relativeFilePath);
         if (!File.Exists(fullPath))
         {
-            throw new FileNotFoundException($"test file not found: {fullPath}");
+            throw new Exception($"test file not found: {fullPath}");
         }
 
-        Process process = new Process
+        string sourceCode = File.ReadAllText(fullPath);
+
+        StringWriter stringWriter = new StringWriter();
+        TextWriter originalOut = Console.Out;
+        TextWriter originalError = Console.Error;
+
+        try
         {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = _runnerPath,
-                Arguments = $"\"{fullPath}\"",
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                CreateNoWindow = true,
-            },
-        };
+            Console.SetOut(stringWriter);
+            Console.SetError(stringWriter);
 
-        process.Start();
-        string output = process.StandardOutput.ReadToEnd();
-        process.WaitForExit();
+            InterpreterEngine interpreter = new InterpreterEngine();
+            interpreter.Execute(sourceCode);
 
-        return output.TrimEnd();
+            return stringWriter.ToString().TrimEnd();
+        }
+        catch (Exception ex)
+        {
+            return stringWriter.ToString() + ex.Message.TrimEnd();
+        }
+        finally
+        {
+            Console.SetOut(originalOut);
+            Console.SetError(originalError);
+            stringWriter.Dispose();
+        }
     }
 }
