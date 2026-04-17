@@ -1,7 +1,8 @@
 using System.Diagnostics;
+
 using Xunit;
 
-namespace tests;
+namespace Tests;
 
 public class AcceptanceTests
 {
@@ -11,39 +12,21 @@ public class AcceptanceTests
     public AcceptanceTests()
     {
         _runnerPath = Path.GetFullPath(
-            Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
-                "..", "..", "..", "..", "src", "Runner", "bin", "Debug", "net10.0", "Runner.exe")
+            Path.Combine(
+                AppDomain.CurrentDomain.BaseDirectory,
+                "..",
+                "..",
+                "..",
+                "..",
+                "src",
+                "Runner",
+                "bin",
+                "Debug",
+                "net10.0",
+                "Runner.exe")
         );
 
         _testDataPath = AppDomain.CurrentDomain.BaseDirectory;
-    }
-
-    private string RunInterpreter(string relativeFilePath)
-    {
-        string fullPath = Path.Combine(_testDataPath, relativeFilePath);
-        if (!File.Exists(fullPath))
-        {
-            throw new FileNotFoundException($"test file not found: {fullPath}");
-        }
-
-        Process process = new Process
-        {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = _runnerPath,
-                Arguments = $"\"{fullPath}\"",
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                CreateNoWindow = true
-            }
-        };
-
-        process.Start();
-        string output = process.StandardOutput.ReadToEnd();
-        process.WaitForExit();
-
-        return output.TrimEnd();
     }
 
     /// <summary>
@@ -112,5 +95,33 @@ public class AcceptanceTests
         string output = RunInterpreter("Programs/SequentialOutput.clvr");
         const string expected = "Hello, World!  /  Hello, World!";
         Assert.Equal(expected, output);
+    }
+
+    private string RunInterpreter(string relativeFilePath)
+    {
+        string fullPath = Path.Combine(_testDataPath, relativeFilePath);
+        if (!File.Exists(fullPath))
+        {
+            throw new FileNotFoundException($"test file not found: {fullPath}");
+        }
+
+        Process process = new Process
+        {
+            StartInfo = new ProcessStartInfo
+            {
+                FileName = _runnerPath,
+                Arguments = $"\"{fullPath}\"",
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true,
+            },
+        };
+
+        process.Start();
+        string output = process.StandardOutput.ReadToEnd();
+        process.WaitForExit();
+
+        return output.TrimEnd();
     }
 }
