@@ -1,7 +1,7 @@
-﻿using Interpreter.Ast;
-using Interpreter.VirtualMachine;
+﻿using Ast;
+using Bytecode;
 
-namespace Interpreter.Codegen;
+namespace Codegen;
 
 public class CodeGenerator : IAstVisitor
 {

@@ -1,6 +1,8 @@
 ﻿using System.Globalization;
 
-namespace Interpreter.VirtualMachine;
+using Bytecode;
+
+namespace VirtualMachine;
 
 public class VirtualMachineExecutor
 {

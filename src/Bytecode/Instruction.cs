@@ -1,4 +1,4 @@
-﻿namespace Interpreter.VirtualMachine;
+﻿namespace Bytecode;
 
 public class Instruction
 {

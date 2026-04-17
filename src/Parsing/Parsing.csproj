@@ -8,12 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Ast\Ast.csproj" />
-    <ProjectReference Include="..\Bytecode\Bytecode.csproj" />
-    <ProjectReference Include="..\Codegen\Codegen.csproj" />
     <ProjectReference Include="..\Lexing\Lexing.csproj" />
-    <ProjectReference Include="..\Parsing\Parsing.csproj" />
-    <ProjectReference Include="..\Semantics\Semantics.csproj" />
-    <ProjectReference Include="..\VirtualMachine\VirtualMachine.csproj" />
   </ItemGroup>
 
 </Project>

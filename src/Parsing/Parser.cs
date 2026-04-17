@@ -1,9 +1,9 @@
 ﻿using System.Globalization;
 
-using Interpreter.Ast;
-using Interpreter.Lexing;
+using Ast;
+using Lexing;
 
-namespace Interpreter.Parsing;
+namespace Parsing;
 
 public class Parser
 {

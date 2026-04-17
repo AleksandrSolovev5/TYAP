@@ -1,4 +1,4 @@
-﻿namespace Interpreter.Lexing;
+﻿namespace Lexing;
 
 public enum TokenType
 {

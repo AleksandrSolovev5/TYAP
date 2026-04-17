@@ -1,4 +1,4 @@
-﻿namespace Interpreter.Ast;
+﻿namespace Ast;
 
 public interface IAstVisitor
 {

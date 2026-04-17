@@ -1,6 +1,6 @@
-﻿using Interpreter.Ast;
+﻿using Ast;
 
-namespace Interpreter.Semantics;
+namespace Semantics;
 
 public class SemanticAnalyzer : IAstVisitor
 {

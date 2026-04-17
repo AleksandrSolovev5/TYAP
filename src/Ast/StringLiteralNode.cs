@@ -1,4 +1,4 @@
-﻿namespace Interpreter.Ast;
+﻿namespace Ast;
 
 public class StringLiteralNode : ExpressionNode
 {

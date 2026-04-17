@@ -23,7 +23,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\src\Interpreter\Interpreter.csproj" />
-    <ProjectReference Include="..\src\Runner\Runner.csproj" />
   </ItemGroup>
 
   <ItemGroup>
