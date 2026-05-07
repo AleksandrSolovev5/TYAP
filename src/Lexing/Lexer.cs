@@ -1,4 +1,6 @@
-﻿namespace Lexing;
+﻿using System.Text;
+
+namespace Lexing;
 
 public class Lexer
 {
@@ -22,7 +24,7 @@ public class Lexer
 
         char current = CurrentChar();
 
-        if (char.IsLetter(current))
+        if (IsEnglishLetter(current))
         {
             return ReadIdentifierOrKeyword();
         }
@@ -37,31 +39,47 @@ public class Lexer
             return ReadString();
         }
 
-        if (current == '(')
+        switch (current)
         {
-            _position++;
-            return new Token(TokenType.LeftRoundBracket, "(");
-        }
+            case '(':
+                return ReadSingleCharacterToken(TokenType.LeftRoundBracket);
 
-        if (current == ')')
-        {
-            _position++;
-            return new Token(TokenType.RightRoundBracket, ")");
-        }
+            case ')':
+                return ReadSingleCharacterToken(TokenType.RightRoundBracket);
 
-        if (current == ',')
-        {
-            _position++;
-            return new Token(TokenType.Comma, ",");
-        }
+            case '[':
+                return ReadSingleCharacterToken(TokenType.LeftSquareBracket);
 
-        if (current == ';')
-        {
-            _position++;
-            return new Token(TokenType.Semicolon, ";");
-        }
+            case ']':
+                return ReadSingleCharacterToken(TokenType.RightSquareBracket);
 
-        throw new Exception("Unexpected character: " + current);
+            case ',':
+                return ReadSingleCharacterToken(TokenType.Comma);
+
+            case ';':
+                return ReadSingleCharacterToken(TokenType.Semicolon);
+
+            case '+':
+                return ReadSingleCharacterToken(TokenType.Plus);
+
+            case '-':
+                return ReadSingleCharacterToken(TokenType.Minus);
+
+            case '*':
+                return ReadSingleCharacterToken(TokenType.Star);
+
+            case '/':
+                return ReadSingleCharacterToken(TokenType.Slash);
+
+            case '%':
+                return ReadSingleCharacterToken(TokenType.Percent);
+
+            case '=':
+                return ReadSingleCharacterToken(TokenType.Equal);
+
+            default:
+                throw new Exception("Unexpected character: " + current);
+        }
     }
 
     private void SkipIgnored()
@@ -133,19 +151,23 @@ public class Lexer
     {
         int start = _position;
 
-        while (!IsAtEnd() && (char.IsLetterOrDigit(CurrentChar()) || CurrentChar() == '_'))
+        while (!IsAtEnd() && IsIdentifierPart(CurrentChar()))
         {
             _position++;
         }
 
         string text = _source.Substring(start, _position - start);
 
-        if (text == "output")
+        return text switch
         {
-            return new Token(TokenType.Output, text);
-        }
-
-        throw new Exception("Unknown identifier: " + text);
+            "input" => new Token(TokenType.Input, text),
+            "output" => new Token(TokenType.Output, text),
+            "int" => new Token(TokenType.Int, text),
+            "float" => new Token(TokenType.Float, text),
+            "string" => new Token(TokenType.String, text),
+            "const" => new Token(TokenType.Const, text),
+            _ => new Token(TokenType.Identifier, text),
+        };
     }
 
     private Token ReadNumber()
@@ -171,8 +193,18 @@ public class Lexer
                 _position++;
             }
 
+            if (!IsAtEnd() && (char.IsLetter(CurrentChar()) || CurrentChar() == '_'))
+            {
+                throw new Exception("Invalid number literal");
+            }
+
             string floatText = _source.Substring(start, _position - start);
             return new Token(TokenType.FloatLiteral, floatText);
+        }
+
+        if (!IsAtEnd() && (char.IsLetter(CurrentChar()) || CurrentChar() == '_'))
+        {
+            throw new Exception("Invalid number literal");
         }
 
         string intText = _source.Substring(start, _position - start);
@@ -183,12 +215,19 @@ public class Lexer
     {
         _position++;
 
-        string text = "";
+        StringBuilder builder = new();
 
         while (!IsAtEnd() && CurrentChar() != '"')
         {
-            text = text + CurrentChar();
-            _position++;
+            if (CurrentChar() == '\\')
+            {
+                builder.Append(ReadEscapeSequence());
+            }
+            else
+            {
+                builder.Append(CurrentChar());
+                _position++;
+            }
         }
 
         if (IsAtEnd())
@@ -197,7 +236,37 @@ public class Lexer
         }
 
         _position++;
-        return new Token(TokenType.StringLiteral, text);
+
+        return new Token(TokenType.StringLiteral, builder.ToString());
+    }
+
+    private char ReadEscapeSequence()
+    {
+        _position++;
+
+        if (IsAtEnd())
+        {
+            throw new Exception("Unterminated escape sequence");
+        }
+
+        char current = CurrentChar();
+        _position++;
+
+        return current switch
+        {
+            '"' => '"',
+            '\\' => '\\',
+            'n' => '\n',
+            't' => '\t',
+            _ => throw new Exception("Unknown escape sequence: \\" + current),
+        };
+    }
+
+    private Token ReadSingleCharacterToken(TokenType type)
+    {
+        string text = _source.Substring(_position, 1);
+        _position++;
+        return new Token(type, text);
     }
 
     private char CurrentChar()
@@ -218,5 +287,15 @@ public class Lexer
     private bool IsAtEnd()
     {
         return _position >= _source.Length;
+    }
+
+    private static bool IsEnglishLetter(char character)
+    {
+        return character is >= 'a' and <= 'z' or >= 'A' and <= 'Z';
+    }
+
+    private static bool IsIdentifierPart(char character)
+    {
+        return IsEnglishLetter(character) || char.IsDigit(character) || character == '_';
     }
 }

@@ -14,7 +14,7 @@ int main()
     const float PI = 3.1415;
 
     $ read radius value
-    input(raduis);
+    input(radius);
 
     $ that variable calculate circle sqaure 
     float circleSquare = radius * radius * PI;
