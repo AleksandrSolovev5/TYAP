@@ -16,5 +16,4 @@ int main()
 	output("\n");
 	output("2 + 2 * 2 = ");
 	output(2 + 2 * 2)
-	$output(20.0 / 10.0); вот так нельзя
 ]

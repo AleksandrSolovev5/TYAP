@@ -50,8 +50,7 @@ public class Parser
     {
         List<StatementNode> statements = [];
 
-        while (_currentToken.Type != endToken &&
-               _currentToken.Type != TokenType.EndOfFile)
+        while (_currentToken.Type != endToken && _currentToken.Type != TokenType.EndOfFile)
         {
             statements.AddRange(ParseStatement());
 
@@ -59,8 +58,7 @@ public class Parser
             {
                 Consume(TokenType.Semicolon);
             }
-            else if (_currentToken.Type != endToken &&
-                     _currentToken.Type != TokenType.EndOfFile)
+            else if (_currentToken.Type != endToken && _currentToken.Type != TokenType.EndOfFile)
             {
                 throw new Exception("Expected semicolon, but found: " + _currentToken.Text);
             }
@@ -71,39 +69,22 @@ public class Parser
 
     private List<StatementNode> ParseStatement()
     {
-        if (_currentToken.Type == TokenType.Int ||
-            _currentToken.Type == TokenType.Float ||
-            _currentToken.Type == TokenType.String)
+        return _currentToken.Type switch
         {
-            return ParseVariableDeclarations();
-        }
+            TokenType.Int or TokenType.Float or TokenType.String => ParseVariableDeclarations(),
 
-        if (_currentToken.Type == TokenType.Const)
-        {
-            return [ParseConstantDefinition()];
-        }
+            TokenType.Const => [ParseConstantDefinition()],
 
-        if (_currentToken.Type == TokenType.Identifier)
-        {
-            return [ParseAssignmentStatement()];
-        }
+            TokenType.Identifier => [ParseAssignmentStatement()],
 
-        if (_currentToken.Type == TokenType.Input)
-        {
-            return [ParseInputStatement()];
-        }
+            TokenType.Input => [ParseInputStatement()],
 
-        if (_currentToken.Type == TokenType.Output)
-        {
-            return [ParseOutputStatement()];
-        }
+            TokenType.Output => [ParseOutputStatement()],
 
-        if (_currentToken.Type == TokenType.LeftSquareBracket)
-        {
-            return [ParseCompoundStatement()];
-        }
+            TokenType.LeftSquareBracket => [ParseCompoundStatement()],
 
-        throw new Exception("Expected statement, but found: " + _currentToken.Text);
+            _ => throw new Exception("Expected statement, but found: " + _currentToken.Text),
+        };
     }
 
     private List<StatementNode> ParseVariableDeclarations()
@@ -246,18 +227,18 @@ public class Parser
         {
             TokenType operatorToken = _currentToken.Type;
 
-            if (operatorToken == TokenType.Plus)
+            Consume(operatorToken);
+
+            ExpressionNode right = ParseMultiplicativeExpression();
+
+            BinaryOperator binaryOperator = operatorToken switch
             {
-                Consume(TokenType.Plus);
-                ExpressionNode right = ParseMultiplicativeExpression();
-                left = new BinaryExpressionNode(left, BinaryOperator.Add, right);
-            }
-            else
-            {
-                Consume(TokenType.Minus);
-                ExpressionNode right = ParseMultiplicativeExpression();
-                left = new BinaryExpressionNode(left, BinaryOperator.Subtract, right);
-            }
+                TokenType.Plus => BinaryOperator.Add,
+                TokenType.Minus => BinaryOperator.Subtract,
+                _ => throw new Exception("Unknown additive operator."),
+            };
+
+            left = new BinaryExpressionNode(left, binaryOperator, right);
         }
 
         return left;
@@ -273,24 +254,19 @@ public class Parser
         {
             TokenType operatorToken = _currentToken.Type;
 
-            if (operatorToken == TokenType.Star)
+            Consume(operatorToken);
+
+            ExpressionNode right = ParseUnaryExpression();
+
+            BinaryOperator binaryOperator = operatorToken switch
             {
-                Consume(TokenType.Star);
-                ExpressionNode right = ParseUnaryExpression();
-                left = new BinaryExpressionNode(left, BinaryOperator.Multiply, right);
-            }
-            else if (operatorToken == TokenType.Slash)
-            {
-                Consume(TokenType.Slash);
-                ExpressionNode right = ParseUnaryExpression();
-                left = new BinaryExpressionNode(left, BinaryOperator.Divide, right);
-            }
-            else
-            {
-                Consume(TokenType.Percent);
-                ExpressionNode right = ParseUnaryExpression();
-                left = new BinaryExpressionNode(left, BinaryOperator.Mod, right);
-            }
+                TokenType.Star => BinaryOperator.Multiply,
+                TokenType.Slash => BinaryOperator.Divide,
+                TokenType.Percent => BinaryOperator.Mod,
+                _ => throw new Exception("Unknown multiplicative operator."),
+            };
+
+            left = new BinaryExpressionNode(left, binaryOperator, right);
         }
 
         return left;
@@ -369,25 +345,23 @@ public class Parser
 
     private DataType ParseType()
     {
-        if (_currentToken.Type == TokenType.Int)
+        switch (_currentToken.Type)
         {
-            Consume(TokenType.Int);
-            return DataType.Int;
-        }
+            case TokenType.Int:
+                Consume(TokenType.Int);
+                return DataType.Int;
 
-        if (_currentToken.Type == TokenType.Float)
-        {
-            Consume(TokenType.Float);
-            return DataType.Float;
-        }
+            case TokenType.Float:
+                Consume(TokenType.Float);
+                return DataType.Float;
 
-        if (_currentToken.Type == TokenType.String)
-        {
-            Consume(TokenType.String);
-            return DataType.String;
-        }
+            case TokenType.String:
+                Consume(TokenType.String);
+                return DataType.String;
 
-        throw new Exception("Expected type, but found: " + _currentToken.Text);
+            default:
+                throw new Exception("Expected type, but found: " + _currentToken.Text);
+        }
     }
 
     private void Consume(TokenType expectedType)
@@ -395,9 +369,7 @@ public class Parser
         if (_currentToken.Type != expectedType)
         {
             throw new Exception(
-                "Expected token " + expectedType +
-                ", but found " + _currentToken.Type +
-                " with text '" + _currentToken.Text + "'.");
+                "Expected token " + expectedType + ", but found " + _currentToken.Type + " with text '" + _currentToken.Text + "'.");
         }
 
         MoveNext();

@@ -1,9 +1,15 @@
 ﻿using Ast;
+
 using Bytecode;
+
 using Codegen;
+
 using Lexing;
+
 using Parsing;
+
 using Semantics;
+
 using VirtualMachine;
 
 namespace Interpreter;
