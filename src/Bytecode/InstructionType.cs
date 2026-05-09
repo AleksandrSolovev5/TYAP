@@ -19,4 +19,6 @@ public enum InstructionType
     Input,
     EnterScope,
     ExitScope,
+    StringLength,
+    StringIndex,
 }

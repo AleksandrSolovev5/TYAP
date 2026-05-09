@@ -117,6 +117,16 @@ public class VirtualMachineExecutor
                     MoveNext();
                     break;
 
+                case InstructionType.StringLength:
+                    ExecuteStringLength();
+                    MoveNext();
+                    break;
+
+                case InstructionType.StringIndex:
+                    ExecuteStringIndex();
+                    MoveNext();
+                    break;
+
                 case InstructionType.Halt:
                     return;
 
@@ -404,6 +414,41 @@ public class VirtualMachineExecutor
             ", got " +
             value.GetType().Name +
             ".");
+    }
+
+    private void ExecuteStringLength()
+    {
+        object value = PopStack();
+
+        if (value is not string text)
+        {
+            throw new Exception("Function 'len' expects string argument.");
+        }
+
+        _stack.Push(text.Length);
+    }
+
+    private void ExecuteStringIndex()
+    {
+        object indexValue = PopStack();
+        object value = PopStack();
+
+        if (value is not string text)
+        {
+            throw new Exception("String index operator expects string value.");
+        }
+
+        if (indexValue is not int index)
+        {
+            throw new Exception("String index must be int.");
+        }
+
+        if (index < 0 || index >= text.Length)
+        {
+            throw new Exception("String index is out of bounds.");
+        }
+
+        _stack.Push(text[index].ToString());
     }
 
     private RuntimeVariable FindVariableOrThrow(string name)

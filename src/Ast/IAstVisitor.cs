@@ -27,4 +27,8 @@ public interface IAstVisitor
     void VisitFloatLiteralNode(FloatLiteralNode floatLiteralNode);
 
     void VisitStringLiteralNode(StringLiteralNode stringLiteralNode);
+
+    void VisitStringLengthExpressionNode(StringLengthExpressionNode stringLengthExpressionNode);
+
+    void VisitStringIndexExpressionNode(StringIndexExpressionNode stringIndexExpressionNode);
 }

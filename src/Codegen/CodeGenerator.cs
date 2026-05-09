@@ -151,6 +151,21 @@ public class CodeGenerator : IAstVisitor
             stringLiteralNode.Value));
     }
 
+    public void VisitStringLengthExpressionNode(StringLengthExpressionNode stringLengthExpressionNode)
+    {
+        stringLengthExpressionNode.Value.Accept(this);
+
+        _instructions.Add(new Instruction(InstructionType.StringLength));
+    }
+
+    public void VisitStringIndexExpressionNode(StringIndexExpressionNode stringIndexExpressionNode)
+    {
+        stringIndexExpressionNode.Value.Accept(this);
+        stringIndexExpressionNode.Index.Accept(this);
+
+        _instructions.Add(new Instruction(InstructionType.StringIndex));
+    }
+
     private void PushDefaultValue(DataType type)
     {
         switch (type)

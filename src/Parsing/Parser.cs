@@ -297,12 +297,16 @@ public class Parser
 
     private ExpressionNode ParsePrimaryExpression()
     {
+        ExpressionNode expression;
+
         if (_currentToken.Type == TokenType.IntLiteral)
         {
             string text = _currentToken.Text;
             Consume(TokenType.IntLiteral);
 
-            return new IntLiteralNode(int.Parse(text, CultureInfo.InvariantCulture));
+            expression = new IntLiteralNode(int.Parse(text, CultureInfo.InvariantCulture));
+
+            return ParsePostfixExpression(expression);
         }
 
         if (_currentToken.Type == TokenType.FloatLiteral)
@@ -310,7 +314,9 @@ public class Parser
             string text = _currentToken.Text;
             Consume(TokenType.FloatLiteral);
 
-            return new FloatLiteralNode(double.Parse(text, CultureInfo.InvariantCulture));
+            expression = new FloatLiteralNode(double.Parse(text, CultureInfo.InvariantCulture));
+
+            return ParsePostfixExpression(expression);
         }
 
         if (_currentToken.Type == TokenType.StringLiteral)
@@ -318,7 +324,9 @@ public class Parser
             string text = _currentToken.Text;
             Consume(TokenType.StringLiteral);
 
-            return new StringLiteralNode(text);
+            expression = new StringLiteralNode(text);
+
+            return ParsePostfixExpression(expression);
         }
 
         if (_currentToken.Type == TokenType.Identifier)
@@ -326,21 +334,52 @@ public class Parser
             string name = _currentToken.Text;
             Consume(TokenType.Identifier);
 
-            return new IdentifierExpressionNode(name);
+            if (name == "len" && _currentToken.Type == TokenType.LeftRoundBracket)
+            {
+                Consume(TokenType.LeftRoundBracket);
+
+                ExpressionNode value = ParseExpression();
+
+                Consume(TokenType.RightRoundBracket);
+
+                expression = new StringLengthExpressionNode(value);
+
+                return ParsePostfixExpression(expression);
+            }
+
+            expression = new IdentifierExpressionNode(name);
+
+            return ParsePostfixExpression(expression);
         }
 
         if (_currentToken.Type == TokenType.LeftRoundBracket)
         {
             Consume(TokenType.LeftRoundBracket);
 
-            ExpressionNode expression = ParseExpression();
+            expression = ParseExpression();
 
             Consume(TokenType.RightRoundBracket);
 
-            return expression;
+            return ParsePostfixExpression(expression);
         }
 
         throw new Exception("Expected expression, but found: " + _currentToken.Text);
+    }
+
+    private ExpressionNode ParsePostfixExpression(ExpressionNode expression)
+    {
+        while (_currentToken.Type == TokenType.LeftSquareBracket)
+        {
+            Consume(TokenType.LeftSquareBracket);
+
+            ExpressionNode index = ParseExpression();
+
+            Consume(TokenType.RightSquareBracket);
+
+            expression = new StringIndexExpressionNode(expression, index);
+        }
+
+        return expression;
     }
 
     private DataType ParseType()

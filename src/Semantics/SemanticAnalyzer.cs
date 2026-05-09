@@ -171,8 +171,7 @@ public class SemanticAnalyzer : IAstVisitor
             if (binaryExpressionNode.OperatorType != BinaryOperator.Add)
             {
                 throw new Exception(
-                    "Operator '" + binaryExpressionNode.OperatorType +
-                    "' cannot be applied to string operands.");
+                    "Operator '" + binaryExpressionNode.OperatorType + "' cannot be applied to string operands.");
             }
 
             binaryExpressionNode.ResultType = DataType.String;
@@ -191,11 +190,43 @@ public class SemanticAnalyzer : IAstVisitor
         {
             throw new Exception(
                 "Unary operator '" + unaryExpressionNode.OperatorType +
-                "' cannot be applied to expression of type " +
-                unaryExpressionNode.Operand.ResultType + ".");
+                "' cannot be applied to expression of type " + unaryExpressionNode.Operand.ResultType + ".");
         }
 
         unaryExpressionNode.ResultType = unaryExpressionNode.Operand.ResultType;
+    }
+
+    public void VisitStringLengthExpressionNode(StringLengthExpressionNode stringLengthExpressionNode)
+    {
+        stringLengthExpressionNode.Value.Accept(this);
+
+        if (stringLengthExpressionNode.Value.ResultType != DataType.String)
+        {
+            throw new Exception(
+                "Function 'len' expects string argument, but got " + stringLengthExpressionNode.Value.ResultType);
+        }
+
+        stringLengthExpressionNode.ResultType = DataType.Int;
+    }
+
+    public void VisitStringIndexExpressionNode(StringIndexExpressionNode stringIndexExpressionNode)
+    {
+        stringIndexExpressionNode.Value.Accept(this);
+        stringIndexExpressionNode.Index.Accept(this);
+
+        if (stringIndexExpressionNode.Value.ResultType != DataType.String)
+        {
+            throw new Exception(
+                "String index operator expects string value, but got " + stringIndexExpressionNode.Value.ResultType);
+        }
+
+        if (stringIndexExpressionNode.Index.ResultType != DataType.Int)
+        {
+            throw new Exception(
+                "String index must be int, but got " + stringIndexExpressionNode.Index.ResultType + ".");
+        }
+
+        stringIndexExpressionNode.ResultType = DataType.String;
     }
 
     public void VisitIntLiteralNode(IntLiteralNode intLiteralNode)
