@@ -5,8 +5,4 @@ output("abcdefghijklmnopqrstuvwxyz"); output("  ");
 output("ABCDEFGHIJKLMNOPQRSTUVWXYZ"); output("  ");
 output("0123456789!@#$%^&*()[]{}<>,./"); output("  ");
 
-
-$ обработка escape-последовательностей на данный момент не поддерживается:
-$ output("\"try\" to\nwrite a \'poem\'");
-$           ^^^ ошибка: unknown identifier 'try' 
 ]
