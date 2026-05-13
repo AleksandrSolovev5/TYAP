@@ -1,0 +1,9 @@
+int main()
+[
+    const float r = 7.0;
+    const float d = 3.0;
+    
+    const float e = r % d;
+
+    output(e);
+]

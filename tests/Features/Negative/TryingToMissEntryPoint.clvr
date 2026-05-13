@@ -1,0 +1,4 @@
+int pain()
+[
+    output("Hello world!");
+]

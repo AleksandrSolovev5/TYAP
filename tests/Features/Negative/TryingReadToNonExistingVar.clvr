@@ -1,0 +1,5 @@
+int main()
+[
+    input(someVar); $ типа нет такой
+    output(someVar);
+]

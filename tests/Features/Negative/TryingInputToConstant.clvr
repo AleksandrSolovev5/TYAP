@@ -1,0 +1,7 @@
+int main()
+[
+    const string str = "sir";
+    input(str); $ lolkek
+
+    output(str);
+]

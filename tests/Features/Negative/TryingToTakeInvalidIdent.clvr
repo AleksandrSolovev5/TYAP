@@ -1,0 +1,5 @@
+int main()
+[
+    int 1_ident = 1;
+    output(1_ident);
+]

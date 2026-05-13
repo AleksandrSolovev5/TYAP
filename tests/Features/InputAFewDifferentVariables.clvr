@@ -1,0 +1,9 @@
+int main()
+[
+    int PORT;
+    float VER;
+    string DOMAIN;
+    input(PORT, VER, DOMAIN);
+
+    output("PORT: ", PORT, ", VER: ", VER, ", DOMAIN: ", DOMAIN);
+]

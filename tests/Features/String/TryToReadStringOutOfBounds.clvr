@@ -1,0 +1,5 @@
+int main()
+[
+    const string hello = "hello!";
+    output(hello[100]);
+]

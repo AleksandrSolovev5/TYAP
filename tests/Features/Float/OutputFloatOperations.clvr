@@ -1,0 +1,8 @@
+int main()
+[
+    float a = 4.0;
+    float b = 2.0;
+
+    output(a + b, " ", a - b, " ", a * b, " ", a / b);
+    $ 6.0 2.0 8.0 2.0
+]

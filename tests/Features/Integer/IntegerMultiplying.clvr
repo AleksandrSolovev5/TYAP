@@ -1,0 +1,7 @@
+int main()
+[
+    int a;
+    int b = 12;
+    input(a);
+    output(a * b);
+]

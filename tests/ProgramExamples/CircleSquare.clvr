@@ -21,5 +21,6 @@ int main()
 
     $ and go to out
     string str = "Circle square: ";
-    output(str, circleSquare);
+    output(str);
+    output(circleSquare);
 ]

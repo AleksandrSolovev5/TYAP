@@ -1,0 +1,6 @@
+int main()
+[
+    int a = 2000000000;
+    int b = 2000000000;
+    output(a + b);
+]

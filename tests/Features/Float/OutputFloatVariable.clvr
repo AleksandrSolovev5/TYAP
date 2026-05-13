@@ -1,0 +1,5 @@
+int main()
+[
+    float fv = 42.0;
+    output(fv);
+]

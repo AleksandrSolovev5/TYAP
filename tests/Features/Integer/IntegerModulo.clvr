@@ -1,0 +1,7 @@
+int main()
+[
+    int a = 14;
+    int b;
+    input(b);
+    output(a % b); $ == 4
+]

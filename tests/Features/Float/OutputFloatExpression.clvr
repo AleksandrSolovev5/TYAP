@@ -1,0 +1,10 @@
+int main()
+[
+    $ a * x^2 + b * x + c 
+
+    float a = 5.0;
+    float b = 4.0;
+    float c = 7.4;
+    float x = 2.0;
+    output(a * a * x + b * x + c); $ 25*2 + 4*2 + 7.4 = 50 + 8 + 7.4 = 65.4
+]

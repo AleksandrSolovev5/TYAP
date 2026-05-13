@@ -5,7 +5,9 @@ int main()
     output("type <width> <height> here:\n");
 
     float width, float height;
-    input(width, height);
+    input(width);
+    input(height);
 
-    output("rectangle square: ", width * height);
+    output("rectangle square: ");
+    output(width * height);
 ]

@@ -1,0 +1,6 @@
+int main()
+[
+    string str;
+    input(str);
+    output(str[len(str) - 1]); $ вывести последний символ строки
+]

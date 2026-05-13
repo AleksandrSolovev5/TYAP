@@ -1,0 +1,9 @@
+int main()
+[
+    const string v1 = "а";
+    const string v2 = "у";
+    const string v3 = "меня";
+    const string v4 = "камыш!";
+
+    output(v1 + " " + v2 + " " + v3 + " " + v4);
+]

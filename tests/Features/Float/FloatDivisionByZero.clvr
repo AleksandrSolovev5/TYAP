@@ -1,0 +1,9 @@
+int main()
+[
+    $ divide by zerooo
+
+    float d = 42.0;
+    float e = d / 0.0;
+
+    output(e);
+]

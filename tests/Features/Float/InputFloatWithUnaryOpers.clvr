@@ -1,0 +1,12 @@
+int main()
+[
+    float a;
+    float b;
+    
+    const float multiplier = 2.0;
+
+    input(a);
+    input(b);
+
+    output(a * multiplier, " ", b * multiplier);
+]

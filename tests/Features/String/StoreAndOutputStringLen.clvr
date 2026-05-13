@@ -1,0 +1,8 @@
+int main()
+[
+    string str;
+    input(str);
+
+    int strlen = len(str);
+    output(strlen);
+]

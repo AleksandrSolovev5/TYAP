@@ -1,0 +1,7 @@
+int main()
+[
+    const string gg = "lorem ipsum";
+
+    gg = "dolor sit amet";
+    output(gg);
+]
