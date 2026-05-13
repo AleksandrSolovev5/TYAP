@@ -26,7 +26,7 @@ public class AcceptanceTests
     public void FeatureOutputInteger()
     {
         string output = RunInterpreter("Features/Integer/OutputInteger.clvr");
-        Assert.Equal("42 /", output);
+        Assert.Equal("42 / -42", output);
     }
 
     [Fact]
