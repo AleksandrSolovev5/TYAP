@@ -55,7 +55,7 @@
 digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
 letter = "A"…"Z" | "a"…"z" ;
 
-ascii_character = ? Символ ASCII(в диапазоне от 0 до 127) ? ;
+ascii_character = ? Символ Unicode(в диапазоне от 0 до 127) ? ;
 escape_sequence = "\" ( "\"" | "\" | "n" | "t" ) ;
 
 identifier = letter, {letter | digit | "_"} ;
