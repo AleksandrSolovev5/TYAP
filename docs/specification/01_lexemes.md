@@ -70,7 +70,7 @@ operator =  "+" | "-" | "*" | "/" | "%" | "=" ;
 
 keyword = "input" | "output" | "int" | "string" | "float" | "const" ;
 
-delimiter = "[" | "]" | ":" | "," ;
+delimiter = "[" | "]" | ";" | "," ;
 
 comment = line_comment | block_comment ;
 
