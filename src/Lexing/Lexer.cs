@@ -42,16 +42,16 @@ public class Lexer
         switch (current)
         {
             case '(':
-                return ReadSingleCharacterToken(TokenType.LeftRoundBracket);
+                return ReadSingleCharacterToken(TokenType.LeftParenthesis);
 
             case ')':
-                return ReadSingleCharacterToken(TokenType.RightRoundBracket);
+                return ReadSingleCharacterToken(TokenType.RightParenthesis);
 
             case '[':
-                return ReadSingleCharacterToken(TokenType.LeftSquareBracket);
+                return ReadSingleCharacterToken(TokenType.LeftBracket);
 
             case ']':
-                return ReadSingleCharacterToken(TokenType.RightSquareBracket);
+                return ReadSingleCharacterToken(TokenType.RightBracket);
 
             case ',':
                 return ReadSingleCharacterToken(TokenType.Comma);
@@ -166,6 +166,7 @@ public class Lexer
             "float" => new Token(TokenType.Float, text),
             "string" => new Token(TokenType.String, text),
             "const" => new Token(TokenType.Const, text),
+            "len" => new Token(TokenType.Len, text),
             _ => new Token(TokenType.Identifier, text),
         };
     }

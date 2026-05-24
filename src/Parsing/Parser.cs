@@ -38,8 +38,8 @@ public class Parser
         }
 
         Consume(TokenType.Identifier);
-        Consume(TokenType.LeftRoundBracket);
-        Consume(TokenType.RightRoundBracket);
+        Consume(TokenType.LeftParenthesis);
+        Consume(TokenType.RightParenthesis);
 
         CompoundStatementNode body = ParseCompoundStatement();
 
@@ -81,7 +81,7 @@ public class Parser
 
             TokenType.Output => [ParseOutputStatement()],
 
-            TokenType.LeftSquareBracket => [ParseCompoundStatement()],
+            TokenType.LeftBracket => [ParseCompoundStatement()],
 
             _ => throw new Exception("Expected statement, but found: " + _currentToken.Text),
         };
@@ -150,7 +150,7 @@ public class Parser
     private InputStatementNode ParseInputStatement()
     {
         Consume(TokenType.Input);
-        Consume(TokenType.LeftRoundBracket);
+        Consume(TokenType.LeftParenthesis);
 
         List<string> names = [];
 
@@ -165,7 +165,7 @@ public class Parser
             Consume(TokenType.Identifier);
         }
 
-        Consume(TokenType.RightRoundBracket);
+        Consume(TokenType.RightParenthesis);
 
         return new InputStatementNode(names);
     }
@@ -173,27 +173,27 @@ public class Parser
     private OutputStatementNode ParseOutputStatement()
     {
         Consume(TokenType.Output);
-        Consume(TokenType.LeftRoundBracket);
+        Consume(TokenType.LeftParenthesis);
 
         List<ExpressionNode> arguments = [];
 
-        if (_currentToken.Type != TokenType.RightRoundBracket)
+        if (_currentToken.Type != TokenType.RightParenthesis)
         {
             arguments = ParseExpressionList();
         }
 
-        Consume(TokenType.RightRoundBracket);
+        Consume(TokenType.RightParenthesis);
 
         return new OutputStatementNode(arguments);
     }
 
     private CompoundStatementNode ParseCompoundStatement()
     {
-        Consume(TokenType.LeftSquareBracket);
+        Consume(TokenType.LeftBracket);
 
-        List<StatementNode> statements = ParseStatementList(TokenType.RightSquareBracket);
+        List<StatementNode> statements = ParseStatementList(TokenType.RightBracket);
 
-        Consume(TokenType.RightSquareBracket);
+        Consume(TokenType.RightBracket);
 
         return new CompoundStatementNode(statements);
     }
@@ -299,82 +299,58 @@ public class Parser
     {
         ExpressionNode expression;
 
-        if (_currentToken.Type == TokenType.IntLiteral)
+        switch (_currentToken.Type)
         {
-            string text = _currentToken.Text;
-            Consume(TokenType.IntLiteral);
+            case TokenType.IntLiteral:
+                expression = new IntLiteralNode(int.Parse(_currentToken.Text, CultureInfo.InvariantCulture));
+                Consume(TokenType.IntLiteral);
+                break;
 
-            expression = new IntLiteralNode(int.Parse(text, CultureInfo.InvariantCulture));
+            case TokenType.FloatLiteral:
+                expression = new FloatLiteralNode(double.Parse(_currentToken.Text, CultureInfo.InvariantCulture));
+                Consume(TokenType.FloatLiteral);
+                break;
 
-            return ParsePostfixExpression(expression);
-        }
+            case TokenType.StringLiteral:
+                expression = new StringLiteralNode(_currentToken.Text);
+                Consume(TokenType.StringLiteral);
+                break;
 
-        if (_currentToken.Type == TokenType.FloatLiteral)
-        {
-            string text = _currentToken.Text;
-            Consume(TokenType.FloatLiteral);
-
-            expression = new FloatLiteralNode(double.Parse(text, CultureInfo.InvariantCulture));
-
-            return ParsePostfixExpression(expression);
-        }
-
-        if (_currentToken.Type == TokenType.StringLiteral)
-        {
-            string text = _currentToken.Text;
-            Consume(TokenType.StringLiteral);
-
-            expression = new StringLiteralNode(text);
-
-            return ParsePostfixExpression(expression);
-        }
-
-        if (_currentToken.Type == TokenType.Identifier)
-        {
-            string name = _currentToken.Text;
-            Consume(TokenType.Identifier);
-
-            if (name == "len" && _currentToken.Type == TokenType.LeftRoundBracket)
-            {
-                Consume(TokenType.LeftRoundBracket);
-
+            case TokenType.Len:
+                Consume(TokenType.Len);
+                Consume(TokenType.LeftParenthesis);
                 ExpressionNode value = ParseExpression();
-
-                Consume(TokenType.RightRoundBracket);
-
+                Consume(TokenType.RightParenthesis);
                 expression = new StringLengthExpressionNode(value);
+                break;
 
-                return ParsePostfixExpression(expression);
-            }
+            case TokenType.Identifier:
+                expression = new IdentifierExpressionNode(_currentToken.Text);
+                Consume(TokenType.Identifier);
+                break;
 
-            expression = new IdentifierExpressionNode(name);
+            case TokenType.LeftParenthesis:
+                Consume(TokenType.LeftParenthesis);
+                expression = ParseExpression();
+                Consume(TokenType.RightParenthesis);
+                break;
 
-            return ParsePostfixExpression(expression);
+            default:
+                throw new Exception("Expected expression, but found: " + _currentToken.Text);
         }
 
-        if (_currentToken.Type == TokenType.LeftRoundBracket)
-        {
-            Consume(TokenType.LeftRoundBracket);
-
-            expression = ParseExpression();
-
-            Consume(TokenType.RightRoundBracket);
-
-            return ParsePostfixExpression(expression);
-        }
-
-        throw new Exception("Expected expression, but found: " + _currentToken.Text);
+        return ParsePostfixExpression(expression);
     }
 
     private ExpressionNode ParsePostfixExpression(ExpressionNode expression)
     {
-        while (_currentToken.Type == TokenType.LeftSquareBracket)
+        while (_currentToken.Type == TokenType.LeftBracket)
         {
-            Consume(TokenType.LeftSquareBracket);
+            Consume(TokenType.LeftBracket);
 
             ExpressionNode index = ParseExpression();
 
-            Consume(TokenType.RightSquareBracket);
+            Consume(TokenType.RightBracket);
 
             expression = new StringIndexExpressionNode(expression, index);
         }

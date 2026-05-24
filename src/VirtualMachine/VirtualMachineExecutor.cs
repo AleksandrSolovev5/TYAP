@@ -8,7 +8,7 @@ public class VirtualMachineExecutor
 {
     private readonly List<Instruction> _instructions;
     private readonly IRuntimeEnvironment _environment;
-    private readonly Stack<object> _stack = [];
+    private readonly Stack<RuntimeValue> _stack = [];
     private readonly Stack<Dictionary<string, RuntimeVariable>> _scopes = [];
 
     private int _instructionPointer;
@@ -34,97 +34,80 @@ public class VirtualMachineExecutor
         while (_instructionPointer < _instructions.Count)
         {
             Instruction instruction = _instructions[_instructionPointer];
+            _instructionPointer++;
 
             switch (instruction.InstructionType)
             {
                 case InstructionType.PushInt:
-                    _stack.Push(instruction.Operand!);
-                    MoveNext();
+                    _stack.Push(RuntimeValue.CreateInt((int)instruction.Operand!));
                     break;
 
                 case InstructionType.PushFloat:
-                    _stack.Push(instruction.Operand!);
-                    MoveNext();
+                    _stack.Push(RuntimeValue.CreateFloat((double)instruction.Operand!));
                     break;
 
                 case InstructionType.PushString:
-                    _stack.Push(instruction.Operand!);
-                    MoveNext();
+                    _stack.Push(RuntimeValue.CreateString((string)instruction.Operand!));
                     break;
 
                 case InstructionType.Add:
                     ExecuteAdd();
-                    MoveNext();
                     break;
 
                 case InstructionType.Subtract:
                     ExecuteSubtract();
-                    MoveNext();
                     break;
 
                 case InstructionType.Multiply:
                     ExecuteMultiply();
-                    MoveNext();
                     break;
 
                 case InstructionType.Divide:
                     ExecuteDivide();
-                    MoveNext();
                     break;
 
                 case InstructionType.Mod:
                     ExecuteMod();
-                    MoveNext();
                     break;
 
                 case InstructionType.UnaryMinus:
                     ExecuteUnaryMinus();
-                    MoveNext();
                     break;
 
                 case InstructionType.DefineVariable:
                     ExecuteDefineVariable(instruction);
-                    MoveNext();
                     break;
 
                 case InstructionType.LoadVariable:
                     ExecuteLoadVariable(instruction);
-                    MoveNext();
                     break;
 
                 case InstructionType.StoreVariable:
                     ExecuteStoreVariable(instruction);
-                    MoveNext();
                     break;
 
                 case InstructionType.Input:
                     ExecuteInput(instruction);
-                    MoveNext();
                     break;
 
                 case InstructionType.Output:
                     ExecuteOutput();
-                    MoveNext();
                     break;
 
                 case InstructionType.EnterScope:
                     EnterScope();
-                    MoveNext();
                     break;
 
                 case InstructionType.ExitScope:
                     ExitScope();
-                    MoveNext();
                     break;
 
                 case InstructionType.StringLength:
                     ExecuteStringLength();
-                    MoveNext();
                     break;
 
                 case InstructionType.StringIndex:
                     ExecuteStringIndex();
-                    MoveNext();
                     break;
 
                 case InstructionType.Halt:
@@ -138,24 +121,24 @@ public class VirtualMachineExecutor
 
     private void ExecuteAdd()
     {
-        object right = PopStack();
-        object left = PopStack();
+        RuntimeValue right = PopStack();
+        RuntimeValue left = PopStack();
 
-        if (left is int leftInt && right is int rightInt)
+        if (left.Type == BytecodeValueType.Int && right.Type == BytecodeValueType.Int)
         {
-            _stack.Push(leftInt + rightInt);
+            _stack.Push(RuntimeValue.CreateInt(left.AsInt() + right.AsInt()));
             return;
         }
 
-        if (left is double leftDouble && right is double rightDouble)
+        if (left.Type == BytecodeValueType.Float && right.Type == BytecodeValueType.Float)
         {
-            _stack.Push(leftDouble + rightDouble);
+            _stack.Push(RuntimeValue.CreateFloat(left.AsFloat() + right.AsFloat()));
             return;
         }
 
-        if (left is string leftString && right is string rightString)
+        if (left.Type == BytecodeValueType.String && right.Type == BytecodeValueType.String)
         {
-            _stack.Push(leftString + rightString);
+            _stack.Push(RuntimeValue.CreateString(left.AsString() + right.AsString()));
             return;
         }
 
@@ -164,18 +147,18 @@ public class VirtualMachineExecutor
 
     private void ExecuteSubtract()
     {
-        object right = PopStack();
-        object left = PopStack();
+        RuntimeValue right = PopStack();
+        RuntimeValue left = PopStack();
 
-        if (left is int leftInt && right is int rightInt)
+        if (left.Type == BytecodeValueType.Int && right.Type == BytecodeValueType.Int)
         {
-            _stack.Push(leftInt - rightInt);
+            _stack.Push(RuntimeValue.CreateInt(left.AsInt() - right.AsInt()));
             return;
         }
 
-        if (left is double leftDouble && right is double rightDouble)
+        if (left.Type == BytecodeValueType.Float && right.Type == BytecodeValueType.Float)
         {
-            _stack.Push(leftDouble - rightDouble);
+            _stack.Push(RuntimeValue.CreateFloat(left.AsFloat() - right.AsFloat()));
             return;
         }
 
@@ -184,18 +167,18 @@ public class VirtualMachineExecutor
 
     private void ExecuteMultiply()
     {
-        object right = PopStack();
-        object left = PopStack();
+        RuntimeValue right = PopStack();
+        RuntimeValue left = PopStack();
 
-        if (left is int leftInt && right is int rightInt)
+        if (left.Type == BytecodeValueType.Int && right.Type == BytecodeValueType.Int)
         {
-            _stack.Push(leftInt * rightInt);
+            _stack.Push(RuntimeValue.CreateInt(left.AsInt() * right.AsInt()));
             return;
         }
 
-        if (left is double leftDouble && right is double rightDouble)
+        if (left.Type == BytecodeValueType.Float && right.Type == BytecodeValueType.Float)
         {
-            _stack.Push(leftDouble * rightDouble);
+            _stack.Push(RuntimeValue.CreateFloat(left.AsFloat() * right.AsFloat()));
             return;
         }
 
@@ -204,28 +187,30 @@ public class VirtualMachineExecutor
 
     private void ExecuteDivide()
     {
-        object right = PopStack();
-        object left = PopStack();
+        RuntimeValue right = PopStack();
+        RuntimeValue left = PopStack();
 
-        if (left is int leftInt && right is int rightInt)
+        if (left.Type == BytecodeValueType.Int && right.Type == BytecodeValueType.Int)
         {
+            int rightInt = right.AsInt();
             if (rightInt == 0)
             {
                 throw new Exception("Division by zero.");
             }
 
-            _stack.Push(leftInt / rightInt);
+            _stack.Push(RuntimeValue.CreateInt(left.AsInt() / rightInt));
             return;
         }
 
-        if (left is double leftDouble && right is double rightDouble)
+        if (left.Type == BytecodeValueType.Float && right.Type == BytecodeValueType.Float)
         {
+            double rightDouble = right.AsFloat();
             if (rightDouble == 0.0)
             {
                 throw new Exception("Division by zero.");
             }
 
-            _stack.Push(leftDouble / rightDouble);
+            _stack.Push(RuntimeValue.CreateFloat(left.AsFloat() / rightDouble));
             return;
         }
 
@@ -234,17 +219,18 @@ public class VirtualMachineExecutor
 
     private void ExecuteMod()
     {
-        object right = PopStack();
-        object left = PopStack();
+        RuntimeValue right = PopStack();
+        RuntimeValue left = PopStack();
 
-        if (left is int leftInt && right is int rightInt)
+        if (left.Type == BytecodeValueType.Int && right.Type == BytecodeValueType.Int)
         {
+            int rightInt = right.AsInt();
             if (rightInt == 0)
             {
                 throw new Exception("Division by zero.");
             }
 
-            _stack.Push(leftInt % rightInt);
+            _stack.Push(RuntimeValue.CreateInt(left.AsInt() % rightInt));
             return;
         }
 
@@ -253,17 +239,17 @@ public class VirtualMachineExecutor
 
     private void ExecuteUnaryMinus()
     {
-        object value = PopStack();
+        RuntimeValue value = PopStack();
 
-        if (value is int intValue)
+        if (value.Type == BytecodeValueType.Int)
         {
-            _stack.Push(-intValue);
+            _stack.Push(RuntimeValue.CreateInt(-value.AsInt()));
             return;
         }
 
-        if (value is double doubleValue)
+        if (value.Type == BytecodeValueType.Float)
         {
-            _stack.Push(-doubleValue);
+            _stack.Push(RuntimeValue.CreateFloat(-value.AsFloat()));
             return;
         }
 
@@ -279,11 +265,11 @@ public class VirtualMachineExecutor
             throw new Exception("Variable '" + definition.Name + "' is already defined in this scope.");
         }
 
-        object value = PopStack();
+        RuntimeValue value = PopStack();
 
         CheckValueType(value, definition.Type);
 
-        RuntimeVariable variable = new(
+        RuntimeVariable variable = new RuntimeVariable(
             definition.Type,
             value,
             definition.IsConstant);
@@ -311,7 +297,7 @@ public class VirtualMachineExecutor
             throw new Exception("Cannot assign value to constant '" + name + "'.");
         }
 
-        object value = PopStack();
+        RuntimeValue value = PopStack();
 
         CheckValueType(value, variable.Type);
 
@@ -341,35 +327,36 @@ public class VirtualMachineExecutor
 
     private void ExecuteOutput()
     {
-        object value = PopStack();
+        RuntimeValue value = PopStack();
 
-        if (value is double number)
+        if (value.Type == BytecodeValueType.Float)
         {
-            _environment.Write(number.ToString(CultureInfo.InvariantCulture));
+            _environment.Write(value.AsFloat().ToString(CultureInfo.InvariantCulture));
             return;
         }
 
-        _environment.Write(value.ToString() ?? string.Empty);
+        _environment.Write(value.ToString());
     }
 
-    private object ParseInputValue(string input, BytecodeValueType type)
+    private RuntimeValue ParseInputValue(string input, BytecodeValueType type)
     {
         return type switch
         {
-            BytecodeValueType.Int => ParseIntInput(input),
-            BytecodeValueType.Float => ParseFloatInput(input),
-            BytecodeValueType.String => input,
+            BytecodeValueType.Int => RuntimeValue.CreateInt(ParseIntInput(input)),
+            BytecodeValueType.Float => RuntimeValue.CreateFloat(ParseFloatInput(input)),
+            BytecodeValueType.String => RuntimeValue.CreateString(input),
             _ => throw new Exception("Unknown input type."),
         };
     }
 
     private static int ParseIntInput(string input)
     {
+        int result;
         if (int.TryParse(
                 input,
                 NumberStyles.Integer,
                 CultureInfo.InvariantCulture,
-                out int result))
+                out result))
         {
             return result;
         }
@@ -379,11 +366,12 @@ public class VirtualMachineExecutor
 
     private static double ParseFloatInput(string input)
     {
+        double result;
         if (double.TryParse(
                 input,
                 NumberStyles.Float,
                 CultureInfo.InvariantCulture,
-                out double result))
+                out result))
         {
             return result;
         }
@@ -391,71 +379,48 @@ public class VirtualMachineExecutor
         throw new Exception("Invalid float input: " + input);
     }
 
-    private void CheckValueType(object value, BytecodeValueType expectedType)
+    private void CheckValueType(RuntimeValue value, BytecodeValueType expectedType)
     {
-        if (expectedType == BytecodeValueType.Int && value is int)
+        if (value.Type != expectedType)
         {
-            return;
+            throw new Exception(
+                "Runtime type mismatch. Expected " + expectedType + ", got " + value.Type + ".");
         }
-
-        if (expectedType == BytecodeValueType.Float && value is double)
-        {
-            return;
-        }
-
-        if (expectedType == BytecodeValueType.String && value is string)
-        {
-            return;
-        }
-
-        throw new Exception(
-            "Runtime type mismatch. Expected " +
-            expectedType +
-            ", got " +
-            value.GetType().Name +
-            ".");
     }
 
     private void ExecuteStringLength()
     {
-        object value = PopStack();
+        RuntimeValue value = PopStack();
+        string text = value.AsString();
 
-        if (value is not string text)
-        {
-            throw new Exception("Function 'len' expects string argument.");
-        }
-
-        _stack.Push(text.Length);
+        StringInfo stringInfo = new StringInfo(text);
+        _stack.Push(RuntimeValue.CreateInt(stringInfo.LengthInTextElements));
     }
 
     private void ExecuteStringIndex()
     {
-        object indexValue = PopStack();
-        object value = PopStack();
+        RuntimeValue indexValue = PopStack();
+        RuntimeValue value = PopStack();
 
-        if (value is not string text)
-        {
-            throw new Exception("String index operator expects string value.");
-        }
+        string text = value.AsString();
+        int index = indexValue.AsInt();
 
-        if (indexValue is not int index)
-        {
-            throw new Exception("String index must be int.");
-        }
+        StringInfo stringInfo = new StringInfo(text);
 
-        if (index < 0 || index >= text.Length)
+        if (index < 0 || index >= stringInfo.LengthInTextElements)
         {
             throw new Exception("String index is out of bounds.");
         }
 
-        _stack.Push(text[index].ToString());
+        _stack.Push(RuntimeValue.CreateString(stringInfo.SubstringByTextElements(index, 1)));
     }
 
     private RuntimeVariable FindVariableOrThrow(string name)
     {
         foreach (Dictionary<string, RuntimeVariable> scope in _scopes)
         {
-            if (scope.TryGetValue(name, out RuntimeVariable? variable))
+            RuntimeVariable? variable;
+            if (scope.TryGetValue(name, out variable))
             {
                 return variable;
             }
@@ -479,7 +444,7 @@ public class VirtualMachineExecutor
         _scopes.Pop();
     }
 
-    private object PopStack()
+    private RuntimeValue PopStack()
     {
         if (_stack.Count == 0)
         {
@@ -497,25 +462,22 @@ public class VirtualMachineExecutor
         }
 
         throw new Exception(
-            "Instruction " +
-            instruction.InstructionType +
-            " has invalid operand.");
+            "Instruction " + instruction.InstructionType + " has invalid operand.");
     }
 
-    private void MoveNext()
+    private class RuntimeVariable
     {
-        _instructionPointer++;
-    }
+        public RuntimeVariable(BytecodeValueType type, RuntimeValue value, bool isConstant)
+        {
+            Type = type;
+            Value = value;
+            IsConstant = isConstant;
+        }
 
-    private class RuntimeVariable(
-        BytecodeValueType type,
-        object value,
-        bool isConstant)
-    {
-        public BytecodeValueType Type { get; } = type;
+        public BytecodeValueType Type { get; }
 
-        public object Value { get; set; } = value;
+        public RuntimeValue Value { get; set; }
 
-        public bool IsConstant { get; } = isConstant;
+        public bool IsConstant { get; }
     }
 }
