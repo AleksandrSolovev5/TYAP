@@ -1,0 +1,5 @@
+int main()
+[
+    string em = "АБВ🗿ГД";
+    output(em[3]);
+]

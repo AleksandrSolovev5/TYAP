@@ -331,6 +331,21 @@ public class AcceptanceTests
         Assert.Contains('\"', output);
     }
 
+    [Fact]
+    public void FeatureStringOfEmojiLength()
+    {
+        string output = RunInterpreter("Features/String/StringOfEmojiLength.clvr");
+        Assert.Contains("3", output);
+        Assert.DoesNotContain("6", output);
+    }
+
+    [Fact]
+    public void FeatureIndexOfEmojiInString()
+    {
+        string output = RunInterpreter("Features/String/IndexOfEmojiInString.clvr");
+        Assert.Contains("🗿", output);
+    }
+
     /// <summary>
     /// приёмочные тесты для полноценных программ
     /// </summary>
