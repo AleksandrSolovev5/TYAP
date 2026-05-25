@@ -20,6 +20,7 @@
 | string | Строковый тип данных         |
 | float  | Вещественный тип данных      |
 | const  | Константа                    |
+| len    | Получение длины строки       |
 
 ## Cинтаксис и правила экранирования литералов
 
@@ -68,7 +69,7 @@ literal = int_literal | string_literal | float_literal ;
 
 operator =  "+" | "-" | "*" | "/" | "%" | "=" ;
 
-keyword = "input" | "output" | "int" | "string" | "float" | "const" ;
+keyword = "input" | "output" | "int" | "string" | "float" | "const" | "len" ;
 
 delimiter = "[" | "]" | ";" | "," ;
 
