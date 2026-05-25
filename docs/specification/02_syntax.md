@@ -12,34 +12,33 @@
 | 1 (низший) | `=`                              | Присваивание   | Правая          |
 
 ## EBNF - грамматика
-````
+```
 program = statement, { ";", statement }, [ ";" ] ;
 type = "int" | "string" | "float";
 
 statement =
-      variable_declaration
-    | constant_definition
-    | assignment
-    | input_statement
-    | output_statement
-    | compound_statement ;
+variable_declaration
+| constant_definition
+| assignment
+| input_statement
+| output_statement
+| compound_statement ;
 
-function_declaration = type, identifier, "(", [ parameter_list ], ")", compound_statement ;
-variable_declaration = type, identifier, [ "=", expression ], { ",", type, identifier, [ "=", expression ] } ;
-constant_definition ="const", type, identifier, "=", expression ;
+variable_declaration = type, identifier, [ "=", expression ], { ",", identifier, [ "=", expression ] } ;
+constant_definition = "const", type, identifier, "=", expression ;
 assignment = identifier, "=", expression ;
-
 
 input_statement = "input", "(", identifier, { ",", identifier }, ")" ;
 output_statement = "output", "(", [ expression_list ], ")" ;
 expression_list = expression, { ",", expression } ;
 
-statement_or_block = statement | compound_statement ;
 compound_statement = "[", statement, { ";", statement }, [ ";" ], "]" ;
 
 expression = additive_expression ;
 additive_expression = multiplicative_expression, { ( "+" | "-" ), multiplicative_expression } ;
 multiplicative_expression = unary_expression, { ( "*" | "/" | "%" ), unary_expression } ;
-unary_expression = ( "+" | "-" ), unary_expression | primary_expression ;
-primary_expression = identifier | literal | "(", expression, ")" ;
-````
+unary_expression = ( "+" | "-" ), unary_expression | postfix_expression ;
+postfix_expression = primary_expression { "[" expression "]" } ;
+primary_expression = identifier | literal | "(", expression, ")" | len_call ;
+len_call = "len", "(", expression, ")" ;
+```
