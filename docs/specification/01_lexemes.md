@@ -21,6 +21,11 @@
 | float  | Вещественный тип данных      |
 | const  | Константа                    |
 | len    | Получение длины строки       |
+| if     | Начало условного оператора   |
+| else   | Альтернативная ветка условного оператора |
+| true   | Булев литерал «истина»       |
+| false  | Булев литерал «ложь»         |
+| bool   | Логический тип данных        |
 
 ## Cинтаксис и правила экранирования литералов
 
@@ -39,6 +44,13 @@
 | Унарный плюс       | `+`      | Унарная        |
 | Унарный минус      | `-`      | Унарная        |
 | Присваивание       | `=`      | Присваивание   |
+| Меньше             | `<`      | Сравнение      |
+| Больше             | `>`      | Сравнение      |
+| Равно              | `==`     | Сравнение      |
+| Не равно           | `!=`     | Сравнение      |
+| Меньше или равно   | `<=`     | Сравнение      |
+| Больше или равно   | `>=`     | Сравнение      |
+| Логическое НЕ      | `!`      | Логическая     |
 
 ## Другие лексемы
 
@@ -56,21 +68,19 @@
 digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
 letter = "A"…"Z" | "a"…"z" ;
 
-ascii_character = ? Символ Unicode(в диапазоне от 0 до 127) ? ;
-escape_sequence = "\" ( "\"" | "\" | "n" | "t" ) ;
-
+ascii_character = ? Символ Unicode (в диапазоне от 0 до 127) ? ;
+escape_sequence = "\" ( "\"" | "\\" | "n" | "t" ) ;
 identifier = letter, {letter | digit | "_"} ;
 
 sign = "+" | "-" ;
 int_literal = [sign], digit, {digit} ;
 float_literal = [sign], digit, {digit}, ".", digit, {digit} ;
 string_literal = '"', {ascii_character - '"' | escape_sequence}, '"' ;
-literal = int_literal | string_literal | float_literal ;
+boolean_literal = "true" | "false" ;                              
+literal = int_literal | string_literal | float_literal | boolean_literal ;   
 
-operator =  "+" | "-" | "*" | "/" | "%" | "=" ;
-
-keyword = "input" | "output" | "int" | "string" | "float" | "const" | "len" ;
-
+operator =  "+" | "-" | "*" | "/" | "%" | "=" | "<" | ">" | "==" | "!=" | "<=" | ">=" ;                 
+keyword = "input" | "output" | "int" | "string" | "float" | "const" | "len" | "bool" | "if" | "else" ;                                
 delimiter = "[" | "]" | ";" | "," ;
 
 comment = line_comment | block_comment ;
@@ -80,6 +90,6 @@ line_comment = "$",{ ? ascii_character - "\n" ? }, "\n";
 block_comment = "$*", { ? ascii_character ? }, "*$" ;
 ignored = white_space | comment ;
 
-token = literal | keyword | delimeter | operator | identifier ;
+token = literal | keyword | delimiter | operator | identifier ;
 lexical_stream = {token | ignored} ;
 ````
