@@ -29,6 +29,8 @@ public enum TokenType
     LessEqual,
     GreaterEqual,
     Exclamation,
+    LogicalAnd,
+    LogicalOr,
     IntLiteral,
     FloatLiteral,
     StringLiteral,

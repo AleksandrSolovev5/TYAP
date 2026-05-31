@@ -152,10 +152,25 @@ public class SemanticAnalyzer : IAstVisitor
 
         BinaryOperator op = binaryExpressionNode.OperatorType;
 
-        bool isComparison = op == BinaryOperator.Less ||
-                            op == BinaryOperator.Greater ||
-                            op == BinaryOperator.LessEqual ||
-                            op == BinaryOperator.GreaterEqual;
+        bool isLogical = op is BinaryOperator.And or BinaryOperator.Or;
+
+        if (isLogical)
+        {
+            if (leftType != DataType.Bool)
+            {
+                throw new Exception(
+                    "Logical operator '" + op +
+                    "' can only be applied to bool operands.");
+            }
+
+            binaryExpressionNode.ResultType = DataType.Bool;
+            return;
+        }
+
+        bool isComparison = op is BinaryOperator.Less or
+                            BinaryOperator.Greater or
+                            BinaryOperator.LessEqual or
+                            BinaryOperator.GreaterEqual;
 
         bool isEquality = op == BinaryOperator.Equal ||
                           op == BinaryOperator.NotEqual;

@@ -106,6 +106,22 @@ public class Lexer
 
                 return ReadSingleCharacterToken(TokenType.Greater);
 
+            case '&':
+                if (PeekChar() == '&')
+                {
+                    return ReadTwoCharacterToken(TokenType.LogicalAnd);
+                }
+
+                throw new Exception("Unexpected character: &.");
+
+            case '|':
+                if (PeekChar() == '|')
+                {
+                    return ReadTwoCharacterToken(TokenType.LogicalOr);
+                }
+
+                throw new Exception("Unexpected character: |.");
+
             default:
                 throw new Exception("Unexpected character: " + current);
         }

@@ -259,7 +259,39 @@ public class Parser
 
     private ExpressionNode ParseExpression()
     {
-        return ParseComparisonExpression();
+        return ParseLogicalOrExpression();
+    }
+
+    private ExpressionNode ParseLogicalOrExpression()
+    {
+        ExpressionNode left = ParseLogicalAndExpression();
+
+        while (_currentToken.Type == TokenType.LogicalOr)
+        {
+            Consume(TokenType.LogicalOr);
+
+            ExpressionNode right = ParseLogicalAndExpression();
+
+            left = new BinaryExpressionNode(left, BinaryOperator.Or, right);
+        }
+
+        return left;
+    }
+
+    private ExpressionNode ParseLogicalAndExpression()
+    {
+        ExpressionNode left = ParseComparisonExpression();
+
+        while (_currentToken.Type == TokenType.LogicalAnd)
+        {
+            Consume(TokenType.LogicalAnd);
+
+            ExpressionNode right = ParseComparisonExpression();
+
+            left = new BinaryExpressionNode(left, BinaryOperator.And, right);
+        }
+
+        return left;
     }
 
     private ExpressionNode ParseComparisonExpression()
