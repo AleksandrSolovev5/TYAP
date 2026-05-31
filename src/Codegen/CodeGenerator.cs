@@ -1,4 +1,4 @@
-﻿using Ast;
+using Ast;
 
 using Bytecode;
 
@@ -128,6 +128,10 @@ public class CodeGenerator : IAstVisitor
         {
             _instructions.Add(new Instruction(InstructionType.UnaryMinus));
         }
+        else if (unaryExpressionNode.OperatorType == UnaryOperator.Not)
+        {
+            _instructions.Add(new Instruction(InstructionType.LogicalNot));
+        }
     }
 
     public void VisitIntLiteralNode(IntLiteralNode intLiteralNode)
@@ -166,6 +170,42 @@ public class CodeGenerator : IAstVisitor
         _instructions.Add(new Instruction(InstructionType.StringIndex));
     }
 
+    public void VisitBoolLiteralNode(BoolLiteralNode boolLiteralNode)
+    {
+        _instructions.Add(new Instruction(
+            InstructionType.PushBool,
+            boolLiteralNode.Value));
+    }
+
+    public void VisitIfStatementNode(IfStatementNode ifStatementNode)
+    {
+        ifStatementNode.Condition.Accept(this);
+
+        int jumpIfFalseIndex = _instructions.Count;
+        _instructions.Add(new Instruction(InstructionType.JumpIfFalse, 0));
+
+        ifStatementNode.ThenBranch.Accept(this);
+
+        if (ifStatementNode.ElseBranch is not null)
+        {
+            int jumpIndex = _instructions.Count;
+            _instructions.Add(new Instruction(InstructionType.Jump, 0));
+
+            int elseStart = _instructions.Count;
+            _instructions[jumpIfFalseIndex] = new Instruction(InstructionType.JumpIfFalse, elseStart);
+
+            ifStatementNode.ElseBranch.Accept(this);
+
+            int endIndex = _instructions.Count;
+            _instructions[jumpIndex] = new Instruction(InstructionType.Jump, endIndex);
+        }
+        else
+        {
+            int endIndex = _instructions.Count;
+            _instructions[jumpIfFalseIndex] = new Instruction(InstructionType.JumpIfFalse, endIndex);
+        }
+    }
+
     private void PushDefaultValue(DataType type)
     {
         switch (type)
@@ -182,6 +222,10 @@ public class CodeGenerator : IAstVisitor
                 _instructions.Add(new Instruction(InstructionType.PushString, string.Empty));
                 break;
 
+            case DataType.Bool:
+                _instructions.Add(new Instruction(InstructionType.PushBool, false));
+                break;
+
             default:
                 throw new Exception("Unknown data type.");
         }
@@ -196,6 +240,12 @@ public class CodeGenerator : IAstVisitor
             BinaryOperator.Multiply => InstructionType.Multiply,
             BinaryOperator.Divide => InstructionType.Divide,
             BinaryOperator.Mod => InstructionType.Mod,
+            BinaryOperator.Less => InstructionType.CompareLess,
+            BinaryOperator.Greater => InstructionType.CompareGreater,
+            BinaryOperator.Equal => InstructionType.CompareEqual,
+            BinaryOperator.NotEqual => InstructionType.CompareNotEqual,
+            BinaryOperator.LessEqual => InstructionType.CompareLessEqual,
+            BinaryOperator.GreaterEqual => InstructionType.CompareGreaterEqual,
             _ => throw new Exception("Unknown binary operator."),
         };
     }
@@ -207,6 +257,7 @@ public class CodeGenerator : IAstVisitor
             DataType.Int => BytecodeValueType.Int,
             DataType.Float => BytecodeValueType.Float,
             DataType.String => BytecodeValueType.String,
+            DataType.Bool => BytecodeValueType.Bool,
             _ => throw new Exception("Unknown data type."),
         };
     }

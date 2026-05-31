@@ -1,4 +1,4 @@
-﻿namespace Ast;
+namespace Ast;
 
 public interface IAstVisitor
 {
@@ -31,4 +31,8 @@ public interface IAstVisitor
     void VisitStringLengthExpressionNode(StringLengthExpressionNode stringLengthExpressionNode);
 
     void VisitStringIndexExpressionNode(StringIndexExpressionNode stringIndexExpressionNode);
+
+    void VisitBoolLiteralNode(BoolLiteralNode boolLiteralNode);
+
+    void VisitIfStatementNode(IfStatementNode ifStatementNode);
 }

@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 
 using Bytecode;
 
@@ -48,6 +48,10 @@ public class VirtualMachineExecutor
 
                 case InstructionType.PushString:
                     _stack.Push(RuntimeValue.CreateString((string)instruction.Operand!));
+                    break;
+
+                case InstructionType.PushBool:
+                    _stack.Push(RuntimeValue.CreateBool((bool)instruction.Operand!));
                     break;
 
                 case InstructionType.Add:
@@ -108,6 +112,42 @@ public class VirtualMachineExecutor
 
                 case InstructionType.StringIndex:
                     ExecuteStringIndex();
+                    break;
+
+                case InstructionType.CompareEqual:
+                    ExecuteCompare(InstructionType.CompareEqual);
+                    break;
+
+                case InstructionType.CompareNotEqual:
+                    ExecuteCompare(InstructionType.CompareNotEqual);
+                    break;
+
+                case InstructionType.CompareLess:
+                    ExecuteCompare(InstructionType.CompareLess);
+                    break;
+
+                case InstructionType.CompareGreater:
+                    ExecuteCompare(InstructionType.CompareGreater);
+                    break;
+
+                case InstructionType.CompareLessEqual:
+                    ExecuteCompare(InstructionType.CompareLessEqual);
+                    break;
+
+                case InstructionType.CompareGreaterEqual:
+                    ExecuteCompare(InstructionType.CompareGreaterEqual);
+                    break;
+
+                case InstructionType.LogicalNot:
+                    ExecuteLogicalNot();
+                    break;
+
+                case InstructionType.Jump:
+                    _instructionPointer = GetOperand<int>(instruction);
+                    break;
+
+                case InstructionType.JumpIfFalse:
+                    ExecuteJumpIfFalse(instruction);
                     break;
 
                 case InstructionType.Halt:
@@ -335,6 +375,12 @@ public class VirtualMachineExecutor
             return;
         }
 
+        if (value.Type == BytecodeValueType.Bool)
+        {
+            _environment.Write(value.AsBool() ? "true" : "false");
+            return;
+        }
+
         _environment.Write(value.ToString());
     }
 
@@ -345,6 +391,7 @@ public class VirtualMachineExecutor
             BytecodeValueType.Int => RuntimeValue.CreateInt(ParseIntInput(input)),
             BytecodeValueType.Float => RuntimeValue.CreateFloat(ParseFloatInput(input)),
             BytecodeValueType.String => RuntimeValue.CreateString(input),
+            BytecodeValueType.Bool => RuntimeValue.CreateBool(ParseBoolInput(input)),
             _ => throw new Exception("Unknown input type."),
         };
     }
@@ -413,6 +460,114 @@ public class VirtualMachineExecutor
         }
 
         _stack.Push(RuntimeValue.CreateString(stringInfo.SubstringByTextElements(index, 1)));
+    }
+
+    private void ExecuteCompare(InstructionType compareType)
+    {
+        RuntimeValue right = PopStack();
+        RuntimeValue left = PopStack();
+
+        if (left.Type != right.Type)
+        {
+            throw new Exception("Cannot compare values of different types.");
+        }
+
+        bool result;
+
+        if (left.Type == BytecodeValueType.Int)
+        {
+            int leftInt = left.AsInt();
+            int rightInt = right.AsInt();
+
+            result = compareType switch
+            {
+                InstructionType.CompareEqual => leftInt == rightInt,
+                InstructionType.CompareNotEqual => leftInt != rightInt,
+                InstructionType.CompareLess => leftInt < rightInt,
+                InstructionType.CompareGreater => leftInt > rightInt,
+                InstructionType.CompareLessEqual => leftInt <= rightInt,
+                InstructionType.CompareGreaterEqual => leftInt >= rightInt,
+                _ => throw new Exception("Unknown comparison type."),
+            };
+        }
+        else if (left.Type == BytecodeValueType.Float)
+        {
+            double leftFloat = left.AsFloat();
+            double rightFloat = right.AsFloat();
+
+            result = compareType switch
+            {
+                InstructionType.CompareEqual => leftFloat == rightFloat,
+                InstructionType.CompareNotEqual => leftFloat != rightFloat,
+                InstructionType.CompareLess => leftFloat < rightFloat,
+                InstructionType.CompareGreater => leftFloat > rightFloat,
+                InstructionType.CompareLessEqual => leftFloat <= rightFloat,
+                InstructionType.CompareGreaterEqual => leftFloat >= rightFloat,
+                _ => throw new Exception("Unknown comparison type."),
+            };
+        }
+        else if (left.Type == BytecodeValueType.String)
+        {
+            string leftString = left.AsString();
+            string rightString = right.AsString();
+
+            result = compareType switch
+            {
+                InstructionType.CompareEqual => leftString == rightString,
+                InstructionType.CompareNotEqual => leftString != rightString,
+                _ => throw new Exception("Operator is not supported for string values."),
+            };
+        }
+        else if (left.Type == BytecodeValueType.Bool)
+        {
+            bool leftBool = left.AsBool();
+            bool rightBool = right.AsBool();
+
+            result = compareType switch
+            {
+                InstructionType.CompareEqual => leftBool == rightBool,
+                InstructionType.CompareNotEqual => leftBool != rightBool,
+                _ => throw new Exception("Operator is not supported for bool values."),
+            };
+        }
+        else
+        {
+            throw new Exception("Unsupported type for comparison.");
+        }
+
+        _stack.Push(RuntimeValue.CreateBool(result));
+    }
+
+    private void ExecuteLogicalNot()
+    {
+        RuntimeValue value = PopStack();
+        _stack.Push(RuntimeValue.CreateBool(!value.AsBool()));
+    }
+
+    private void ExecuteJumpIfFalse(Instruction instruction)
+    {
+        int target = GetOperand<int>(instruction);
+        RuntimeValue value = PopStack();
+
+        if (!value.AsBool())
+        {
+            _instructionPointer = target;
+        }
+    }
+
+    private static bool ParseBoolInput(string input)
+    {
+        if (input == "true")
+        {
+            return true;
+        }
+
+        if (input == "false")
+        {
+            return false;
+        }
+
+        throw new Exception("Invalid bool input: " + input);
     }
 
     private RuntimeVariable FindVariableOrThrow(string name)

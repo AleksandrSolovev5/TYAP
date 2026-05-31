@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 
 using Ast;
 
@@ -71,7 +71,7 @@ public class Parser
     {
         return _currentToken.Type switch
         {
-            TokenType.Int or TokenType.Float or TokenType.String => ParseVariableDeclarations(),
+            TokenType.Int or TokenType.Float or TokenType.String or TokenType.Bool => ParseVariableDeclarations(),
 
             TokenType.Const => [ParseConstantDefinition()],
 
@@ -82,6 +82,8 @@ public class Parser
             TokenType.Output => [ParseOutputStatement()],
 
             TokenType.LeftBracket => [ParseCompoundStatement()],
+
+            TokenType.If => [ParseIfStatement()],
 
             _ => throw new Exception("Expected statement, but found: " + _currentToken.Text),
         };
@@ -198,6 +200,48 @@ public class Parser
         return new CompoundStatementNode(statements);
     }
 
+    private IfStatementNode ParseIfStatement()
+    {
+        Consume(TokenType.If);
+        Consume(TokenType.LeftParenthesis);
+
+        ExpressionNode condition = ParseExpression();
+
+        Consume(TokenType.RightParenthesis);
+
+        List<StatementNode> thenStatements = ParseStatement();
+        StatementNode thenBranch;
+
+        if (thenStatements.Count == 1)
+        {
+            thenBranch = thenStatements[0];
+        }
+        else
+        {
+            thenBranch = new CompoundStatementNode(thenStatements);
+        }
+
+        StatementNode? elseBranch = null;
+
+        if (_currentToken.Type == TokenType.Else)
+        {
+            Consume(TokenType.Else);
+
+            List<StatementNode> elseStatements = ParseStatement();
+
+            if (elseStatements.Count == 1)
+            {
+                elseBranch = elseStatements[0];
+            }
+            else
+            {
+                elseBranch = new CompoundStatementNode(elseStatements);
+            }
+        }
+
+        return new IfStatementNode(condition, thenBranch, elseBranch);
+    }
+
     private List<ExpressionNode> ParseExpressionList()
     {
         List<ExpressionNode> expressions = [];
@@ -215,15 +259,43 @@ public class Parser
 
     private ExpressionNode ParseExpression()
     {
-        return ParseAdditiveExpression();
+        return ParseComparisonExpression();
+    }
+
+    private ExpressionNode ParseComparisonExpression()
+    {
+        ExpressionNode left = ParseAdditiveExpression();
+
+        while (_currentToken.Type is TokenType.Less or TokenType.Greater or TokenType.EqualEqual or TokenType.NotEqual or TokenType.LessEqual or TokenType.GreaterEqual)
+        {
+            TokenType operatorToken = _currentToken.Type;
+
+            Consume(operatorToken);
+
+            ExpressionNode right = ParseAdditiveExpression();
+
+            BinaryOperator binaryOperator = operatorToken switch
+            {
+                TokenType.Less => BinaryOperator.Less,
+                TokenType.Greater => BinaryOperator.Greater,
+                TokenType.EqualEqual => BinaryOperator.Equal,
+                TokenType.NotEqual => BinaryOperator.NotEqual,
+                TokenType.LessEqual => BinaryOperator.LessEqual,
+                TokenType.GreaterEqual => BinaryOperator.GreaterEqual,
+                _ => throw new Exception("Unknown comparison operator."),
+            };
+
+            left = new BinaryExpressionNode(left, binaryOperator, right);
+        }
+
+        return left;
     }
 
     private ExpressionNode ParseAdditiveExpression()
     {
         ExpressionNode left = ParseMultiplicativeExpression();
 
-        while (_currentToken.Type == TokenType.Plus ||
-               _currentToken.Type == TokenType.Minus)
+        while (_currentToken.Type is TokenType.Plus or TokenType.Minus)
         {
             TokenType operatorToken = _currentToken.Type;
 
@@ -248,9 +320,7 @@ public class Parser
     {
         ExpressionNode left = ParseUnaryExpression();
 
-        while (_currentToken.Type == TokenType.Star ||
-               _currentToken.Type == TokenType.Slash ||
-               _currentToken.Type == TokenType.Percent)
+        while (_currentToken.Type is TokenType.Star or TokenType.Slash or TokenType.Percent)
         {
             TokenType operatorToken = _currentToken.Type;
 
@@ -292,6 +362,15 @@ public class Parser
             return new UnaryExpressionNode(UnaryOperator.Minus, operand);
         }
 
+        if (_currentToken.Type == TokenType.Exclamation)
+        {
+            Consume(TokenType.Exclamation);
+
+            ExpressionNode operand = ParseUnaryExpression();
+
+            return new UnaryExpressionNode(UnaryOperator.Not, operand);
+        }
+
         return ParsePrimaryExpression();
     }
 
@@ -314,6 +393,11 @@ public class Parser
             case TokenType.StringLiteral:
                 expression = new StringLiteralNode(_currentToken.Text);
                 Consume(TokenType.StringLiteral);
+                break;
+
+            case TokenType.BoolLiteral:
+                expression = new BoolLiteralNode(_currentToken.Text == "true");
+                Consume(TokenType.BoolLiteral);
                 break;
 
             case TokenType.Len:
@@ -373,6 +457,10 @@ public class Parser
             case TokenType.String:
                 Consume(TokenType.String);
                 return DataType.String;
+
+            case TokenType.Bool:
+                Consume(TokenType.Bool);
+                return DataType.Bool;
 
             default:
                 throw new Exception("Expected type, but found: " + _currentToken.Text);

@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 
 namespace Lexing;
 
@@ -75,7 +75,36 @@ public class Lexer
                 return ReadSingleCharacterToken(TokenType.Percent);
 
             case '=':
+                if (PeekChar() == '=')
+                {
+                    return ReadTwoCharacterToken(TokenType.EqualEqual);
+                }
+
                 return ReadSingleCharacterToken(TokenType.Equal);
+
+            case '!':
+                if (PeekChar() == '=')
+                {
+                    return ReadTwoCharacterToken(TokenType.NotEqual);
+                }
+
+                return ReadSingleCharacterToken(TokenType.Exclamation);
+
+            case '<':
+                if (PeekChar() == '=')
+                {
+                    return ReadTwoCharacterToken(TokenType.LessEqual);
+                }
+
+                return ReadSingleCharacterToken(TokenType.Less);
+
+            case '>':
+                if (PeekChar() == '=')
+                {
+                    return ReadTwoCharacterToken(TokenType.GreaterEqual);
+                }
+
+                return ReadSingleCharacterToken(TokenType.Greater);
 
             default:
                 throw new Exception("Unexpected character: " + current);
@@ -167,6 +196,11 @@ public class Lexer
             "string" => new Token(TokenType.String, text),
             "const" => new Token(TokenType.Const, text),
             "len" => new Token(TokenType.Len, text),
+            "bool" => new Token(TokenType.Bool, text),
+            "if" => new Token(TokenType.If, text),
+            "else" => new Token(TokenType.Else, text),
+            "true" => new Token(TokenType.BoolLiteral, text),
+            "false" => new Token(TokenType.BoolLiteral, text),
             _ => new Token(TokenType.Identifier, text),
         };
     }
@@ -267,6 +301,13 @@ public class Lexer
     {
         string text = _source.Substring(_position, 1);
         _position++;
+        return new Token(type, text);
+    }
+
+    private Token ReadTwoCharacterToken(TokenType type)
+    {
+        string text = _source.Substring(_position, 2);
+        _position += 2;
         return new Token(type, text);
     }
 

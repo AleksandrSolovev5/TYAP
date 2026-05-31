@@ -1,4 +1,4 @@
-﻿using Bytecode;
+using Bytecode;
 
 namespace VirtualMachine;
 
@@ -27,6 +27,11 @@ public readonly struct RuntimeValue
     public static RuntimeValue CreateString(string value)
     {
         return new RuntimeValue(BytecodeValueType.String, value);
+    }
+
+    public static RuntimeValue CreateBool(bool value)
+    {
+        return new RuntimeValue(BytecodeValueType.Bool, value);
     }
 
     public int AsInt()
@@ -59,8 +64,23 @@ public readonly struct RuntimeValue
         return (string)_value;
     }
 
+    public bool AsBool()
+    {
+        if (Type != BytecodeValueType.Bool)
+        {
+            throw new InvalidOperationException($"Runtime type mismatch. Expected Bool, but got {Type}.");
+        }
+
+        return (bool)_value;
+    }
+
     public override string ToString()
     {
+        if (Type == BytecodeValueType.Bool)
+        {
+            return (bool)_value ? "true" : "false";
+        }
+
         return _value?.ToString() ?? string.Empty;
     }
 }

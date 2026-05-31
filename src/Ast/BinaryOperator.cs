@@ -1,4 +1,4 @@
-﻿namespace Ast;
+namespace Ast;
 
 public enum BinaryOperator
 {
@@ -7,4 +7,10 @@ public enum BinaryOperator
     Multiply,
     Divide,
     Mod,
+    Less,
+    Greater,
+    Equal,
+    NotEqual,
+    LessEqual,
+    GreaterEqual,
 }

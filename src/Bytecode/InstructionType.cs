@@ -1,10 +1,11 @@
-﻿namespace Bytecode;
+namespace Bytecode;
 
 public enum InstructionType
 {
     PushInt,
     PushFloat,
     PushString,
+    PushBool,
     Output,
     Halt,
     Add,
@@ -21,4 +22,13 @@ public enum InstructionType
     ExitScope,
     StringLength,
     StringIndex,
+    CompareEqual,
+    CompareNotEqual,
+    CompareLess,
+    CompareGreater,
+    CompareLessEqual,
+    CompareGreaterEqual,
+    LogicalNot,
+    Jump,
+    JumpIfFalse,
 }

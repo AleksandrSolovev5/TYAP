@@ -1,4 +1,4 @@
-﻿using Ast;
+using Ast;
 
 namespace Semantics;
 
@@ -119,9 +119,10 @@ public class SemanticAnalyzer : IAstVisitor
 
             if (argument.ResultType != DataType.Int &&
                 argument.ResultType != DataType.Float &&
-                argument.ResultType != DataType.String)
+                argument.ResultType != DataType.String &&
+                argument.ResultType != DataType.Bool)
             {
-                throw new Exception("Output supports only int, float and string.");
+                throw new Exception("Output supports only int, float, string and bool.");
             }
         }
     }
@@ -149,33 +150,88 @@ public class SemanticAnalyzer : IAstVisitor
                 leftType + " and " + rightType + ".");
         }
 
-        if (leftType == DataType.Int)
-        {
-            binaryExpressionNode.ResultType = DataType.Int;
-            return;
-        }
+        BinaryOperator op = binaryExpressionNode.OperatorType;
 
-        if (leftType == DataType.Float)
-        {
-            if (binaryExpressionNode.OperatorType == BinaryOperator.Mod)
-            {
-                throw new Exception("Operator '%' cannot be applied to float operands.");
-            }
+        bool isComparison = op == BinaryOperator.Less ||
+                            op == BinaryOperator.Greater ||
+                            op == BinaryOperator.LessEqual ||
+                            op == BinaryOperator.GreaterEqual;
 
-            binaryExpressionNode.ResultType = DataType.Float;
-            return;
-        }
+        bool isEquality = op == BinaryOperator.Equal ||
+                          op == BinaryOperator.NotEqual;
 
-        if (leftType == DataType.String)
+        bool isArithmetic = op == BinaryOperator.Add ||
+                            op == BinaryOperator.Subtract ||
+                            op == BinaryOperator.Multiply ||
+                            op == BinaryOperator.Divide ||
+                            op == BinaryOperator.Mod;
+
+        if (isComparison)
         {
-            if (binaryExpressionNode.OperatorType != BinaryOperator.Add)
+            if (leftType != DataType.Int && leftType != DataType.Float)
             {
                 throw new Exception(
-                    "Operator '" + binaryExpressionNode.OperatorType + "' cannot be applied to string operands.");
+                    "Comparison operator '" + op +
+                    "' can only be applied to int or float operands.");
             }
 
-            binaryExpressionNode.ResultType = DataType.String;
+            binaryExpressionNode.ResultType = DataType.Bool;
             return;
+        }
+
+        if (isEquality)
+        {
+            if (leftType != DataType.Int &&
+                leftType != DataType.Float &&
+                leftType != DataType.String &&
+                leftType != DataType.Bool)
+            {
+                throw new Exception(
+                    "Equality operator '" + op +
+                    "' cannot be applied to operands of type " + leftType + ".");
+            }
+
+            binaryExpressionNode.ResultType = DataType.Bool;
+            return;
+        }
+
+        if (isArithmetic)
+        {
+            if (leftType == DataType.Bool)
+            {
+                throw new Exception(
+                    "Arithmetic operator '" + op +
+                    "' cannot be applied to bool operands.");
+            }
+
+            if (leftType == DataType.Int)
+            {
+                binaryExpressionNode.ResultType = DataType.Int;
+                return;
+            }
+
+            if (leftType == DataType.Float)
+            {
+                if (op == BinaryOperator.Mod)
+                {
+                    throw new Exception("Operator '%' cannot be applied to float operands.");
+                }
+
+                binaryExpressionNode.ResultType = DataType.Float;
+                return;
+            }
+
+            if (leftType == DataType.String)
+            {
+                if (op != BinaryOperator.Add)
+                {
+                    throw new Exception(
+                        "Operator '" + op + "' cannot be applied to string operands.");
+                }
+
+                binaryExpressionNode.ResultType = DataType.String;
+                return;
+            }
         }
 
         throw new Exception("Unsupported binary expression type.");
@@ -184,6 +240,19 @@ public class SemanticAnalyzer : IAstVisitor
     public void VisitUnaryExpressionNode(UnaryExpressionNode unaryExpressionNode)
     {
         unaryExpressionNode.Operand.Accept(this);
+
+        if (unaryExpressionNode.OperatorType == UnaryOperator.Not)
+        {
+            if (unaryExpressionNode.Operand.ResultType != DataType.Bool)
+            {
+                throw new Exception(
+                    "Unary operator '!' cannot be applied to expression of type " +
+                    unaryExpressionNode.Operand.ResultType + ".");
+            }
+
+            unaryExpressionNode.ResultType = DataType.Bool;
+            return;
+        }
 
         if (unaryExpressionNode.Operand.ResultType != DataType.Int &&
             unaryExpressionNode.Operand.ResultType != DataType.Float)
@@ -242,6 +311,30 @@ public class SemanticAnalyzer : IAstVisitor
     public void VisitStringLiteralNode(StringLiteralNode stringLiteralNode)
     {
         stringLiteralNode.ResultType = DataType.String;
+    }
+
+    public void VisitBoolLiteralNode(BoolLiteralNode boolLiteralNode)
+    {
+        boolLiteralNode.ResultType = DataType.Bool;
+    }
+
+    public void VisitIfStatementNode(IfStatementNode ifStatementNode)
+    {
+        ifStatementNode.Condition.Accept(this);
+
+        if (ifStatementNode.Condition.ResultType != DataType.Bool)
+        {
+            throw new Exception(
+                "Condition of 'if' statement must be bool, but got " +
+                ifStatementNode.Condition.ResultType + ".");
+        }
+
+        ifStatementNode.ThenBranch.Accept(this);
+
+        if (ifStatementNode.ElseBranch is not null)
+        {
+            ifStatementNode.ElseBranch.Accept(this);
+        }
     }
 
     private void EnterScope()

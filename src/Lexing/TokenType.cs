@@ -1,4 +1,4 @@
-﻿namespace Lexing;
+namespace Lexing;
 
 public enum TokenType
 {
@@ -22,8 +22,19 @@ public enum TokenType
     Slash,
     Percent,
     Equal,
+    EqualEqual,
+    NotEqual,
+    Less,
+    Greater,
+    LessEqual,
+    GreaterEqual,
+    Exclamation,
     IntLiteral,
     FloatLiteral,
     StringLiteral,
+    BoolLiteral,
+    Bool,
+    If,
+    Else,
     EndOfFile,
 }
