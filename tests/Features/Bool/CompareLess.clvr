@@ -1,0 +1,14 @@
+int main()
+[
+    int age;
+    input(age);
+
+    if (age < 18)
+    [
+        output("вы несовершеннолетний");
+    ]
+    else    $ age >= 18 
+    [
+        output("вы совершеннолетний");
+    ]
+]

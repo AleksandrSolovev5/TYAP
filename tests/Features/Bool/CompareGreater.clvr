@@ -1,0 +1,16 @@
+int main()
+[
+    string name;
+    input(name);
+
+    const string ref = "Василий";
+
+    if (len(name) > len(ref))
+    [
+        output("ваше имя длиннее, чем \"", ref, "\"\n");
+    ]
+    else
+    [
+        output("ваше имя не длиннее, чем \"", ref, "\"\n");
+    ]
+]

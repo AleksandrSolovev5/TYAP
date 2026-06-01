@@ -1,0 +1,14 @@
+int main()
+[
+    output("введите \"true\" или \"false\":\n");
+    bool in;
+    input(in);
+    if (in)
+    [
+        output("вы ввели true");
+    ]
+    else 
+    [
+        output("вы ввели false");
+    ]
+]

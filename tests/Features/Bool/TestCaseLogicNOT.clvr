@@ -1,0 +1,15 @@
+int main()
+[
+    int age;
+    input(age);
+    bool adult = age >= 18;
+
+    if (!adult)
+    [
+        output("за руль рано");
+    ]
+    else
+    [
+        output("за руль можно");
+    ]
+]

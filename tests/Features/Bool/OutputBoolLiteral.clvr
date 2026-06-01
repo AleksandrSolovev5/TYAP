@@ -1,0 +1,7 @@
+int main()
+[
+    int yourAge;
+    input(yourAge);
+    bool is18YearsOld = yourAge >= 18;
+    output(is18YearsOld);
+]

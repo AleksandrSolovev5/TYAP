@@ -1,0 +1,28 @@
+int main()
+[
+    output("ответ на вопрос - можем ли мы отправить email лиду:\n");
+    
+    output("у него есть активная сделка? (y / n)\n");
+    string dealAnswer;
+    input(dealAnswer);
+    
+    output("у него есть активный триал? (y / n)\n");
+    string trialAnswer;
+    input(trialAnswer);
+
+    bool hasDeal = dealAnswer == "y";
+    bool hasTrial = trialAnswer == "y";
+
+    if (!hasDeal && !hasTrial)
+    [
+        output("спокойно можем отправлять ему рассылки");
+    ]
+    else if (!hasDeal && hasTrial)
+    [
+        output("можем отправлять ему только офферные рассылки");
+    ]
+    else
+    [
+        output("мы не можем ему ничего отправлять");
+    ]
+]

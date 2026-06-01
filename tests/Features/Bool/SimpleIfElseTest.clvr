@@ -1,0 +1,21 @@
+int main()
+[
+    output("вам нравится учиться? (да / нет)\n");
+    string answer;
+    input(answer);
+    if (answer == "да")
+    [
+        output("молодец!");
+    ]
+    else
+    [
+        if (answer == "нет")
+        [
+            output("плохо, отчисляйся!");
+        ]
+        else
+        [
+            output("непонятно что ввёл");
+        ]
+    ]
+]

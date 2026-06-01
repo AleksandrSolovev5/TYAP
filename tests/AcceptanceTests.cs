@@ -346,6 +346,251 @@ public class AcceptanceTests
         Assert.Contains("🗿", output);
     }
 
+    [Fact]
+    public void FeatureSimpleIfElseTest()
+    {
+        IRuntimeEnvironment env1 = new TestRuntimeEnvironment("да");
+        string output1 = RunInterpreter("Features/Bool/SimpleIfElseTest.clvr", env1);
+        Assert.Contains("молодец!", output1);
+
+        IRuntimeEnvironment env2 = new TestRuntimeEnvironment("нет");
+        string output2 = RunInterpreter("Features/Bool/SimpleIfElseTest.clvr", env2);
+        Assert.Contains("плохо, отчисляйся!", output2);
+
+        IRuntimeEnvironment env3 = new TestRuntimeEnvironment("вбрбирвиьв");
+        string output3 = RunInterpreter("Features/Bool/SimpleIfElseTest.clvr", env3);
+        Assert.Contains("непонятно что ввёл", output3);
+    }
+
+    [Fact]
+    public void FeatureOutputBoolLiteral()
+    {
+        IRuntimeEnvironment env1 = new TestRuntimeEnvironment("14");
+        string output1 = RunInterpreter("Features/Bool/OutputBoolLiteral.clvr", env1);
+        Assert.Contains("false", output1);
+
+        IRuntimeEnvironment env2 = new TestRuntimeEnvironment("22");
+        string output2 = RunInterpreter("Features/Bool/OutputBoolLiteral.clvr", env2);
+        Assert.Contains("true", output2);
+    }
+
+    [Fact]
+    public void FeatureLogicAND()
+    {
+        IRuntimeEnvironment env1 = new TestRuntimeEnvironment("n", "n");
+        string output1 = RunInterpreter("Features/Bool/TestCaseLogicAND.clvr", env1);
+        Assert.Contains("спокойно можем отправлять ему рассылки", output1);
+
+        IRuntimeEnvironment env2 = new TestRuntimeEnvironment("n", "y");
+        string output2 = RunInterpreter("Features/Bool/TestCaseLogicAND.clvr", env2);
+        Assert.Contains("можем отправлять ему только офферные рассылки", output2);
+
+        IRuntimeEnvironment env3 = new TestRuntimeEnvironment("y", "n");
+        string output3 = RunInterpreter("Features/Bool/TestCaseLogicAND.clvr", env3);
+        Assert.Contains("мы не можем ему ничего отправлять", output3);
+
+        IRuntimeEnvironment env4 = new TestRuntimeEnvironment("y", "y");
+        string output4 = RunInterpreter("Features/Bool/TestCaseLogicAND.clvr", env4);
+        Assert.Contains("мы не можем ему ничего отправлять", output4);
+    }
+
+    [Fact]
+    public void FeatureLogicOR()
+    {
+        IRuntimeEnvironment env1 = new TestRuntimeEnvironment("доширак");
+        string output1 = RunInterpreter("Features/Bool/TestCaseLogicOR.clvr", env1);
+        Assert.Contains("не жри эту отраву!!!", output1);
+
+        IRuntimeEnvironment env2 = new TestRuntimeEnvironment("колбаса");
+        string output2 = RunInterpreter("Features/Bool/TestCaseLogicOR.clvr", env2);
+        Assert.Contains("не жри эту отраву!!!", output2);
+
+        IRuntimeEnvironment env3 = new TestRuntimeEnvironment("творог");
+        string output3 = RunInterpreter("Features/Bool/TestCaseLogicOR.clvr", env3);
+        Assert.Contains("молодец, за здоровое питание", output3);
+
+        IRuntimeEnvironment env4 = new TestRuntimeEnvironment("вода");
+        string output4 = RunInterpreter("Features/Bool/TestCaseLogicOR.clvr", env4);
+        Assert.Contains("молодец, за здоровое питание", output4);
+
+        IRuntimeEnvironment env5 = new TestRuntimeEnvironment("резина");
+        string output5 = RunInterpreter("Features/Bool/TestCaseLogicOR.clvr", env5);
+        Assert.Contains("пересмотрите своё решение", output5);
+    }
+
+    [Fact]
+    public void FeatureLogicNOT()
+    {
+        IRuntimeEnvironment env1 = new TestRuntimeEnvironment("14");
+        string output1 = RunInterpreter("Features/Bool/TestCaseLogicNOT.clvr", env1);
+        Assert.Contains("за руль рано", output1);
+
+        IRuntimeEnvironment env2 = new TestRuntimeEnvironment("22");
+        string output2 = RunInterpreter("Features/Bool/TestCaseLogicNOT.clvr", env2);
+        Assert.Contains("за руль можно", output2);
+    }
+
+    [Fact]
+    public void FeatureShortCircuitEvaluation()
+    {
+        IRuntimeEnvironment env1 = new TestRuntimeEnvironment("true");
+        string output1 = RunInterpreter("Features/Bool/ShortCircuitEvaluation.clvr", env1);
+        Assert.Contains("final destination", output1);
+
+        IRuntimeEnvironment env2 = new TestRuntimeEnvironment("false");
+        Exception ex = Assert.Throws<Exception>(() => RunInterpreter("Features/Bool/ShortCircuitEvaluation.clvr", env2));
+        Assert.Contains("Division by zero.", ex.Message);
+    }
+
+    [Fact]
+    public void FeatureInputBoolLiteral()
+    {
+        IRuntimeEnvironment env1 = new TestRuntimeEnvironment("true");
+        string output1 = RunInterpreter("Features/Bool/InputBoolLiteral.clvr", env1);
+        Assert.Contains("вы ввели true", output1);
+
+        IRuntimeEnvironment env2 = new TestRuntimeEnvironment("false");
+        string output2 = RunInterpreter("Features/Bool/InputBoolLiteral.clvr", env2);
+        Assert.Contains("вы ввели false", output2);
+
+        IRuntimeEnvironment env3 = new TestRuntimeEnvironment("maybe");
+        Exception ex = Assert.Throws<Exception>(() => RunInterpreter("Features/Bool/InputBoolLiteral.clvr", env2));
+        Assert.Contains("No more input", ex.Message);
+    }
+
+    [Fact]
+    public void FeatureLogicOperatorsPriority()
+    {
+        string output = RunInterpreter("Features/Bool/LogicOperatorsPriority.clvr");
+        Assert.Contains("fact1 = true", output);
+        Assert.Contains("fact2 = false", output);
+        Assert.Contains("fact3 = false", output);
+        Assert.Contains("fact4 = true", output);
+        Assert.Contains("fact5 = true", output);
+        Assert.Contains("fact6 = false", output);
+        Assert.Contains("fact7 = true", output);
+    }
+
+    [Fact]
+    public void FeatureInnerIfElseConditions() // проблемы висячего else у нас нет, [] явно
+    {
+        IRuntimeEnvironment env1 = new TestRuntimeEnvironment("12");
+        string output1 = RunInterpreter("Features/Bool/InnerIfElseConditions.clvr", env1);
+        Assert.Contains("between 11 and 14 inclusive", output1);
+
+        IRuntimeEnvironment env2 = new TestRuntimeEnvironment("10");
+        string output2 = RunInterpreter("Features/Bool/InnerIfElseConditions.clvr", env2);
+        Assert.Contains("less than 10 or equal", output2);
+
+        IRuntimeEnvironment env3 = new TestRuntimeEnvironment("15");
+        string output3 = RunInterpreter("Features/Bool/InnerIfElseConditions.clvr", env3);
+        Assert.Contains("greater than 15 or equal", output3);
+    }
+
+    [Fact]
+    public void FeatureCompareLess()
+    {
+        IRuntimeEnvironment env1 = new TestRuntimeEnvironment("12");
+        string output1 = RunInterpreter("Features/Bool/CompareLess.clvr", env1);
+        Assert.Contains("вы несовершеннолетний", output1);
+
+        IRuntimeEnvironment env2 = new TestRuntimeEnvironment("18");
+        string output2 = RunInterpreter("Features/Bool/CompareLess.clvr", env2);
+        Assert.Contains("вы совершеннолетний", output2);
+
+        IRuntimeEnvironment env3 = new TestRuntimeEnvironment("19");
+        string output3 = RunInterpreter("Features/Bool/CompareLess.clvr", env3);
+        Assert.Contains("вы совершеннолетний", output3);
+    }
+
+    [Fact]
+    public void FeatureCompareLessEqual()
+    {
+        IRuntimeEnvironment env1 = new TestRuntimeEnvironment("17");
+        string output1 = RunInterpreter("Features/Bool/CompareLessEqual.clvr", env1);
+        Assert.Contains("не призывной возраст", output1);
+
+        IRuntimeEnvironment env2 = new TestRuntimeEnvironment("18");
+        string output2 = RunInterpreter("Features/Bool/CompareLessEqual.clvr", env2);
+        Assert.Contains("потенциальный призывник", output2);
+
+        IRuntimeEnvironment envMid = new TestRuntimeEnvironment("24");
+        string outputMid = RunInterpreter("Features/Bool/CompareLessEqual.clvr", envMid);
+        Assert.Contains("потенциальный призывник", outputMid);
+
+        IRuntimeEnvironment env3 = new TestRuntimeEnvironment("30");
+        string output3 = RunInterpreter("Features/Bool/CompareLessEqual.clvr", env3);
+        Assert.Contains("потенциальный призывник", output3);
+
+        IRuntimeEnvironment env4 = new TestRuntimeEnvironment("31");
+        string output4 = RunInterpreter("Features/Bool/CompareLessEqual.clvr", env4);
+        Assert.Contains("не призывной возраст", output4);
+    }
+
+    [Fact]
+    public void FeatureCompareGreater()
+    {
+        IRuntimeEnvironment env1 = new TestRuntimeEnvironment("Александр");
+        string output1 = RunInterpreter("Features/Bool/CompareGreater.clvr", env1);
+        Assert.Contains("ваше имя длиннее, чем \"Василий\"", output1);
+
+        IRuntimeEnvironment env2 = new TestRuntimeEnvironment("Виталий");
+        string output2 = RunInterpreter("Features/Bool/CompareGreater.clvr", env2);
+        Assert.Contains("ваше имя не длиннее, чем \"Василий\"", output2);
+
+        IRuntimeEnvironment env3 = new TestRuntimeEnvironment("Илья");
+        string output3 = RunInterpreter("Features/Bool/CompareGreater.clvr", env3);
+        Assert.Contains("ваше имя не длиннее, чем \"Василий\"", output3);
+    }
+
+    [Fact]
+    public void FeatureCompareGreaterEqual()
+    {
+        IRuntimeEnvironment env1 = new TestRuntimeEnvironment("18");
+        string output1 = RunInterpreter("Features/Bool/CompareGreaterEqual.clvr", env1);
+        Assert.Contains("вы совершеннолетний", output1);
+
+        IRuntimeEnvironment env2 = new TestRuntimeEnvironment("19");
+        string output2 = RunInterpreter("Features/Bool/CompareGreaterEqual.clvr", env2);
+        Assert.Contains("вы совершеннолетний", output2);
+
+        IRuntimeEnvironment env3 = new TestRuntimeEnvironment("17");
+        string output3 = RunInterpreter("Features/Bool/CompareGreaterEqual.clvr", env3);
+        Assert.Contains("вы несовершеннолетний", output3);
+    }
+
+    [Fact]
+    public void FeatureCompareEqual()
+    {
+        IRuntimeEnvironment env1 = new TestRuntimeEnvironment("1900");
+        string output1 = RunInterpreter("Features/Bool/CompareEqual.clvr", env1);
+        Assert.Contains("1900 - невисокосный год", output1);
+
+        IRuntimeEnvironment env2 = new TestRuntimeEnvironment("2000");
+        string output2 = RunInterpreter("Features/Bool/CompareEqual.clvr", env2);
+        Assert.Contains("2000 - високосный год", output2);
+
+        IRuntimeEnvironment env3 = new TestRuntimeEnvironment("2012");
+        string output3 = RunInterpreter("Features/Bool/CompareEqual.clvr", env3);
+        Assert.Contains("2012 - високосный год", output3);
+
+        IRuntimeEnvironment env4 = new TestRuntimeEnvironment("2026");
+        string output4 = RunInterpreter("Features/Bool/CompareEqual.clvr", env4);
+        Assert.Contains("2026 - невисокосный год", output4);
+    }
+
+    [Fact]
+    public void FeatureCompareNotEqual()
+    {
+        IRuntimeEnvironment env1 = new TestRuntimeEnvironment("27188218");
+        string output1 = RunInterpreter("Features/Bool/CompareNotEqual.clvr", env1);
+        Assert.Contains("верный пароль", output1);
+
+        IRuntimeEnvironment env2 = new TestRuntimeEnvironment("22866611");
+        string output2 = RunInterpreter("Features/Bool/CompareNotEqual.clvr", env2);
+        Assert.Contains("вы не угадали пароль", output2);
+    }
+
     /// <summary>
     /// приёмочные тесты для полноценных программ
     /// </summary>

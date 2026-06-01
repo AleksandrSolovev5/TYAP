@@ -1,0 +1,16 @@
+int main()
+[
+    int age;
+    input(age);
+    const int MILITARY_AGE_MAX = 30;
+    const int MILITARY_AGE_MIN = 18;
+
+    if (age <= MILITARY_AGE_MAX && age >= MILITARY_AGE_MIN)
+    [
+        output("потенциальный призывник");
+    ]
+    else
+    [
+        output("не призывной возраст");
+    ]
+]

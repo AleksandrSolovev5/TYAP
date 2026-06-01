@@ -1,0 +1,16 @@
+int main()
+[
+    output("введите текущий год, чтобы узнать, високосный ли он");
+    int year;
+    input(year);
+
+    bool isLeap = (year % 4 == 0) && (year % 100 != 0 || year % 400 == 0);
+    if (isLeap)
+    [
+        output(year, " - високосный год");
+    ]
+    else
+    [
+        output(year, " - невисокосный год");
+    ]
+]

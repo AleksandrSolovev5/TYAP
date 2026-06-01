@@ -1,0 +1,22 @@
+int main()
+[
+    string str = "wonder where you are";
+    int m;
+    input(m);
+    if (m > 10)
+    [
+        if (m < 15)
+        [
+            str = "between 11 and 14 inclusive";
+        ]
+        else
+        [
+            str = "greater than 15 or equal";
+        ]
+    ]
+    else
+    [
+        str = "less than 10 or equal";
+    ];  $ <--- если после if есть еще инструкции, то нужно ставить ;
+    output(str);
+]

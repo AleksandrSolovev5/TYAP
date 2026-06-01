@@ -1,0 +1,15 @@
+int main()
+[
+    int password;
+    const int EXPECTED_PASSWORD = 27188218;
+
+    input(password);
+    if (password != EXPECTED_PASSWORD)
+    [
+        output("вы не угадали пароль");
+    ]
+    else
+    [
+        output("верный пароль");
+    ]
+]
