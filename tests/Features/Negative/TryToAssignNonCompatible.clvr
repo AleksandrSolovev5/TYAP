@@ -1,0 +1,5 @@
+int main()
+[
+    int g = "hello mom";
+    output(g);
+]

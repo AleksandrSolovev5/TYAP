@@ -347,6 +347,20 @@ public class AcceptanceTests
     }
 
     [Fact]
+    public void FeatureStringUnsupportedMultOper()
+    {
+        Exception ex = Assert.Throws<Exception>(() => RunInterpreter("Features/String/StringUnsupportedMultOper.clvr"));
+        Assert.Contains("Operator 'Multiply' cannot be applied to", ex.Message);
+    }
+
+    [Fact]
+    public void FeatureStringUnsupportedSubOper()
+    {
+        Exception ex = Assert.Throws<Exception>(() => RunInterpreter("Features/String/StringUnsupportedSubOper.clvr"));
+        Assert.Contains("Operator 'Subtract' cannot be applied to", ex.Message);
+    }
+
+    [Fact]
     public void FeatureSimpleIfElseTest()
     {
         IRuntimeEnvironment env1 = new TestRuntimeEnvironment("да");
@@ -454,8 +468,8 @@ public class AcceptanceTests
         Assert.Contains("вы ввели false", output2);
 
         IRuntimeEnvironment env3 = new TestRuntimeEnvironment("maybe");
-        Exception ex = Assert.Throws<Exception>(() => RunInterpreter("Features/Bool/InputBoolLiteral.clvr", env2));
-        Assert.Contains("No more input", ex.Message);
+        Exception ex = Assert.Throws<Exception>(() => RunInterpreter("Features/Bool/InputBoolLiteral.clvr", env3));
+        Assert.Contains("Invalid bool input", ex.Message);
     }
 
     [Fact]
@@ -589,6 +603,90 @@ public class AcceptanceTests
         IRuntimeEnvironment env2 = new TestRuntimeEnvironment("22866611");
         string output2 = RunInterpreter("Features/Bool/CompareNotEqual.clvr", env2);
         Assert.Contains("вы не угадали пароль", output2);
+    }
+
+    [Fact]
+    public void FeatureIfWithoutElse()
+    {
+        string output = RunInterpreter("Features/Bool/IfWithoutElse.clvr");
+        Assert.Contains("всё хорошо", output);
+    }
+
+    [Fact]
+    public void FeatureElseIfConstruction()
+    {
+        IRuntimeEnvironment env1 = new TestRuntimeEnvironment("asia");
+        string output1 = RunInterpreter("Features/Bool/ElseIfConstruction.clvr", env1);
+        Assert.Contains("ваш регион: Азия", output1);
+
+        IRuntimeEnvironment env2 = new TestRuntimeEnvironment("na");
+        string output2 = RunInterpreter("Features/Bool/ElseIfConstruction.clvr", env2);
+        Assert.Contains("ваш регион: Северная Америка", output2);
+
+        IRuntimeEnvironment env3 = new TestRuntimeEnvironment("emea");
+        string output3 = RunInterpreter("Features/Bool/ElseIfConstruction.clvr", env3);
+        Assert.Contains("ваш регион: Европа", output3);
+
+        IRuntimeEnvironment env4 = new TestRuntimeEnvironment("anz");
+        string output4 = RunInterpreter("Features/Bool/ElseIfConstruction.clvr", env4);
+        Assert.Contains("ваш регион: Австралия", output4);
+
+        IRuntimeEnvironment env5 = new TestRuntimeEnvironment("latam");
+        string output5 = RunInterpreter("Features/Bool/ElseIfConstruction.clvr", env5);
+        Assert.Contains("неизвестный регион", output5);
+    }
+
+    [Fact]
+    public void FeatureNotABoolCondition()
+    {
+        Exception ex = Assert.Throws<Exception>(() => RunInterpreter("Features/Bool/NotABoolCondition.clvr"));
+        Assert.Contains("Condition of 'if' statement must be bool", ex.Message);
+    }
+
+    [Fact]
+    public void FeatureOutputBoolExpression()
+    {
+        string output = RunInterpreter("Features/Bool/OutputBoolExpression.clvr");
+        Assert.Contains("-Equality-false", output);
+        Assert.Contains("-NonEquality-true", output);
+    }
+
+    [Fact]
+    public void FeatureTryToAssignNonCompatible()
+    {
+        Exception ex = Assert.Throws<Exception>(() => RunInterpreter("Features/Negative/TryToAssignNonCompatible.clvr"));
+        Assert.Contains("Cannot initialize variable", ex.Message);
+    }
+
+    [Fact]
+    public void FeatureTryBinaryOpersForDiffTypes()
+    {
+        Exception ex = Assert.Throws<Exception>(() => RunInterpreter("Features/Negative/TryBinaryOpersForDiffTypes.clvr"));
+        Assert.Contains("Binary operator", ex.Message);
+        Assert.Contains("cannot be applied", ex.Message);
+    }
+
+    [Fact]
+    public void FeatureTryEnterInnerScopeFromOuter()
+    {
+        Exception ex = Assert.Throws<Exception>(() => RunInterpreter("Features/Negative/TryEnterInnerScopeFromOuter.clvr"));
+        Assert.Contains("Variable", ex.Message);
+        Assert.Contains("is not declared.", ex.Message);
+    }
+
+    [Fact]
+    public void FeatureTryToCompareStrings()
+    {
+        Exception ex = Assert.Throws<Exception>(() => RunInterpreter("Features/Negative/TryToCompareStrings.clvr"));
+        Assert.Contains("Comparison operator", ex.Message); // SemanticAnalyzer
+        Assert.Contains("can only be applied to int or float operands.", ex.Message);
+    }
+
+    [Fact]
+    public void FeatureTryToEmptyOutput()
+    {
+        string output = RunInterpreter("Features/Negative/TryToEmptyOutput.clvr");
+        Assert.Empty(output);
     }
 
     /// <summary>

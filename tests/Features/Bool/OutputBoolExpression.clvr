@@ -1,0 +1,7 @@
+int main()
+[
+    bool b1 = false;
+    bool b2 = true;
+    output("-Equality-", b1 == b2, "\n");
+    output("-NonEquality-", b1 != b2);
+]

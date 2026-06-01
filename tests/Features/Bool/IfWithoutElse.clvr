@@ -1,0 +1,9 @@
+int main()
+[
+    int param = 1;
+    if (true)
+    [
+        param = 2;
+    ];
+    output("всё хорошо");
+]

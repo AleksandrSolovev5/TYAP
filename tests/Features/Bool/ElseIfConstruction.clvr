@@ -1,0 +1,25 @@
+int main()
+[
+    string enReg;
+    input(enReg);
+    if (enReg == "asia")
+    [
+        output("ваш регион: Азия");
+    ]
+    else if (enReg == "na")
+    [
+        output("ваш регион: Северная Америка");
+    ]
+    else if (enReg == "emea")
+    [
+        output("ваш регион: Европа");
+    ]
+    else if (enReg == "anz")
+    [
+        output("ваш регион: Австралия");
+    ]
+    else
+    [
+        output("неизвестный регион");
+    ]
+]

@@ -1,0 +1,15 @@
+int main()
+[
+    $ <, >, <=, >= для строк не поддерживаются
+    string a = "avg";
+    string b = "aver";
+
+    if (b > a)
+    [
+        output(b);
+    ]
+    else
+    [
+        output(a);
+    ]
+]
