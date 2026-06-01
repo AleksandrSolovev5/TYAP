@@ -132,48 +132,6 @@ public class CodeGenerator : IAstVisitor
         _instructions.Add(new Instruction(instructionType));
     }
 
-    private void GenerateShortCircuitAnd(BinaryExpressionNode node)
-    {
-        node.Left.Accept(this);
-
-        int jumpIfFalseIndex = _instructions.Count;
-        _instructions.Add(new Instruction(InstructionType.JumpIfFalse, 0));
-
-        node.Right.Accept(this);
-
-        int jumpToEndIndex = _instructions.Count;
-        _instructions.Add(new Instruction(InstructionType.Jump, 0));
-
-        int falseLabelIndex = _instructions.Count;
-        _instructions[jumpIfFalseIndex] = new Instruction(InstructionType.JumpIfFalse, falseLabelIndex);
-        _instructions.Add(new Instruction(InstructionType.PushBool, false));
-
-        int endLabelIndex = _instructions.Count;
-        _instructions[jumpToEndIndex] = new Instruction(InstructionType.Jump, endLabelIndex);
-    }
-
-    private void GenerateShortCircuitOr(BinaryExpressionNode node)
-    {
-        node.Left.Accept(this);
-
-        _instructions.Add(new Instruction(InstructionType.LogicalNot));
-
-        int jumpIfFalseIndex = _instructions.Count;
-        _instructions.Add(new Instruction(InstructionType.JumpIfFalse, 0));
-
-        node.Right.Accept(this);
-
-        int jumpToEndIndex = _instructions.Count;
-        _instructions.Add(new Instruction(InstructionType.Jump, 0));
-
-        int trueLabelIndex = _instructions.Count;
-        _instructions[jumpIfFalseIndex] = new Instruction(InstructionType.JumpIfFalse, trueLabelIndex);
-        _instructions.Add(new Instruction(InstructionType.PushBool, true));
-
-        int endLabelIndex = _instructions.Count;
-        _instructions[jumpToEndIndex] = new Instruction(InstructionType.Jump, endLabelIndex);
-    }
-
     public void VisitUnaryExpressionNode(UnaryExpressionNode unaryExpressionNode)
     {
         unaryExpressionNode.Operand.Accept(this);
@@ -258,6 +216,48 @@ public class CodeGenerator : IAstVisitor
             int endIndex = _instructions.Count;
             _instructions[jumpIfFalseIndex] = new Instruction(InstructionType.JumpIfFalse, endIndex);
         }
+    }
+
+    private void GenerateShortCircuitAnd(BinaryExpressionNode node)
+    {
+        node.Left.Accept(this);
+
+        int jumpIfFalseIndex = _instructions.Count;
+        _instructions.Add(new Instruction(InstructionType.JumpIfFalse, 0));
+
+        node.Right.Accept(this);
+
+        int jumpToEndIndex = _instructions.Count;
+        _instructions.Add(new Instruction(InstructionType.Jump, 0));
+
+        int falseLabelIndex = _instructions.Count;
+        _instructions[jumpIfFalseIndex] = new Instruction(InstructionType.JumpIfFalse, falseLabelIndex);
+        _instructions.Add(new Instruction(InstructionType.PushBool, false));
+
+        int endLabelIndex = _instructions.Count;
+        _instructions[jumpToEndIndex] = new Instruction(InstructionType.Jump, endLabelIndex);
+    }
+
+    private void GenerateShortCircuitOr(BinaryExpressionNode node)
+    {
+        node.Left.Accept(this);
+
+        _instructions.Add(new Instruction(InstructionType.LogicalNot));
+
+        int jumpIfFalseIndex = _instructions.Count;
+        _instructions.Add(new Instruction(InstructionType.JumpIfFalse, 0));
+
+        node.Right.Accept(this);
+
+        int jumpToEndIndex = _instructions.Count;
+        _instructions.Add(new Instruction(InstructionType.Jump, 0));
+
+        int trueLabelIndex = _instructions.Count;
+        _instructions[jumpIfFalseIndex] = new Instruction(InstructionType.JumpIfFalse, trueLabelIndex);
+        _instructions.Add(new Instruction(InstructionType.PushBool, true));
+
+        int endLabelIndex = _instructions.Count;
+        _instructions[jumpToEndIndex] = new Instruction(InstructionType.Jump, endLabelIndex);
     }
 
     private void PushDefaultValue(DataType type)
